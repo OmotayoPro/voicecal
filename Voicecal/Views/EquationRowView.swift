@@ -2,6 +2,7 @@ import SwiftUI
 
 struct EquationRowView: View {
     let equation: Equation
+    var isListening = false
     let onTapToken: (UUID) -> Void
     let onTapGap: (Int) -> Void
 
@@ -22,10 +23,16 @@ struct EquationRowView: View {
     }
 
     private var placeholder: some View {
-        Text("0")
-            .font(DesignTokens.Typography.display)
-            .foregroundStyle(DesignTokens.Colors.textPrimary)
-            .accessibilityLabel("Empty equation")
+        HStack(spacing: 0) {
+            Text("0")
+                .font(DesignTokens.Typography.display)
+                .foregroundStyle(DesignTokens.Colors.textPrimary)
+                .accessibilityLabel("Empty equation")
+            if isListening {
+                CursorView(isGlowing: true)
+            }
+        }
+        .padding(.horizontal, DesignTokens.Size.cursorWidth)
     }
 
     private var row: some View {
@@ -64,7 +71,7 @@ struct EquationRowView: View {
             }
             .overlay {
                 if equation.cursorIndex == index, equation.editingTokenID == nil {
-                    CursorView()
+                    CursorView(isGlowing: isListening)
                         .fixedSize()
                         .allowsHitTesting(false)
                 }
