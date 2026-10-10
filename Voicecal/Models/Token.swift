@@ -35,6 +35,11 @@ enum Token: Identifiable, Equatable {
         }
     }
 
+    /// `text` with a typographic minus on negative numbers.
+    var displayText: String {
+        text.hasPrefix("-") ? "−" + text.dropFirst() : text
+    }
+
     var isNumber: Bool {
         if case .number = self {
             true

@@ -40,6 +40,15 @@ final class CalculatorUITests: XCTestCase {
         snapshot("cursor-mid")
     }
 
+    func testLiveResultThenEquals() {
+        tap("1", "2", "Add", "3", "Multiply", "4")
+        XCTAssertEqual(app.staticTexts["status"].label, "= 24")
+        snapshot("live-result")
+        tap("Equals")
+        XCTAssertTrue(app.buttons["Token 1 of 1, number 24"].exists)
+        XCTAssertFalse(app.staticTexts["status"].exists)
+    }
+
     func testClearReturnsToEmptyState() {
         tap("5", "Add", "Clear all")
         XCTAssertTrue(app.staticTexts["Empty equation"].exists)

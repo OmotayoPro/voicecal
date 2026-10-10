@@ -56,6 +56,7 @@ enum DesignTokens {
 
     enum Opacity {
         static let keyGloss: Double = 0.2
+        static let secondaryText: Double = 0.55
         static let edgeHighlightStrong: Double = 0.5
         static let edgeHighlightTop: Double = 0.2
         static let edgeHighlightBottom: Double = 0.3
@@ -64,5 +65,6 @@ enum DesignTokens {
     enum Typography {
         static let display = Font.system(size: 64, weight: .regular)
         static let key = Font.system(size: 32, weight: .medium)
+        static let liveResult = Font.system(size: 28, weight: .regular)
     }
 }

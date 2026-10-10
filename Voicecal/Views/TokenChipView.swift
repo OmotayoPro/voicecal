@@ -5,7 +5,7 @@ struct TokenChipView: View {
     let isEditing: Bool
 
     var body: some View {
-        Text(token.text)
+        Text(token.displayText)
             .font(DesignTokens.Typography.display)
             .foregroundStyle(DesignTokens.Colors.textPrimary)
             .lineLimit(1)
