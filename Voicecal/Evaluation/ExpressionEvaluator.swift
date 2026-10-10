@@ -45,12 +45,6 @@ enum ExpressionEvaluator {
     }
 }
 
-private extension Character {
-    var isASCIIDigit: Bool {
-        isASCII && isNumber
-    }
-}
-
 private struct Parser {
     let tokens: [Token]
     private var position = 0

@@ -2,3 +2,4 @@
 # SwiftLint's default trailing_comma rule forbids them
 --disable trailingCommas
 --exclude build
+--disable wrapMultilineStatementBraces
