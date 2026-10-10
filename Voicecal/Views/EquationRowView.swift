@@ -45,21 +45,31 @@ struct EquationRowView: View {
             }
             gap(at: equation.tokens.count)
         }
+        // Room for the cursor at either end.
+        .padding(.horizontal, DesignTokens.Size.cursorWidth)
     }
 
-    /// The space before the token at `index`. Tapping it moves the cursor there.
+    /// The boundary before the token at `index`. It takes no space, so tokens sit flush;
+    /// the cursor and a narrow tap strip are drawn over it.
     private func gap(at index: Int) -> some View {
         Color.clear
-            .frame(width: DesignTokens.Spacing.tokenGap, height: DesignTokens.Size.cursorHeight)
+            .frame(width: 0, height: DesignTokens.Size.cursorHeight)
+            .overlay {
+                Color.clear
+                    .frame(width: DesignTokens.Spacing.cursorTapWidth, height: DesignTokens.Size.cursorHeight)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        onTapGap(index)
+                    }
+            }
             .overlay {
                 if equation.cursorIndex == index, equation.editingTokenID == nil {
                     CursorView()
+                        .fixedSize()
+                        .allowsHitTesting(false)
                 }
             }
-            .contentShape(Rectangle())
-            .onTapGesture {
-                onTapGap(index)
-            }
+            .zIndex(1)
     }
 
     private func accessibilityLabel(for token: Token, at index: Int) -> String {

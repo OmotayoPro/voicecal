@@ -10,8 +10,7 @@ struct TokenChipView: View {
             .foregroundStyle(DesignTokens.Colors.textPrimary)
             .lineLimit(1)
             .fixedSize()
-            .padding(.horizontal, DesignTokens.Spacing.chipHorizontal)
-            .frame(minWidth: DesignTokens.Size.minTapTarget, minHeight: DesignTokens.Size.minTapTarget)
+            .frame(minHeight: DesignTokens.Size.minTapTarget)
             .background {
                 if isEditing {
                     // A filled, outlined box so the focused state does not rely on color alone.
@@ -21,6 +20,7 @@ struct TokenChipView: View {
                             DesignTokens.Colors.highlight.opacity(DesignTokens.Opacity.edgeHighlightStrong),
                             lineWidth: DesignTokens.Size.keyRing
                         )
+                        .padding(.horizontal, -DesignTokens.Spacing.chipOutset)
                 }
             }
             .contentShape(Rectangle())
