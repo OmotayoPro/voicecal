@@ -14,6 +14,15 @@ final class SpeechRecognizerService: SpeechRecognizing {
     private var isRunning = false
     private var taskStartedAt = ContinuousClock.now
     private var rapidFailures = 0
+    private var observers: [NSObjectProtocol] = []
+
+    init() {
+        observers = [Self.observeInterruptions { [weak self] in
+            self?.stopBecauseAudioWasTaken()
+        }, Self.observeLostInput { [weak self] in
+            self?.stopBecauseAudioWasTaken()
+        }]
+    }
 
     func requestPermission() async -> SpeechPermission {
         guard await AVAudioApplication.requestRecordPermission() else { return .microphoneDenied }
@@ -54,6 +63,13 @@ final class SpeechRecognizerService: SpeechRecognizing {
         request = nil
         task = nil
         try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
+    }
+
+    /// A call, Siri, or an unplugged headset took the microphone away.
+    private func stopBecauseAudioWasTaken() {
+        guard isRunning else { return }
+        stop()
+        onEvent?(.stopped)
     }
 
     // MARK: - Recognition tasks
@@ -107,6 +123,34 @@ final class SpeechRecognizerService: SpeechRecognizing {
         await withCheckedContinuation { continuation in
             SFSpeechRecognizer.requestAuthorization { status in
                 continuation.resume(returning: status)
+            }
+        }
+    }
+
+    private nonisolated static func observeInterruptions(
+        _ onBegan: @escaping @MainActor () -> Void
+    ) -> NSObjectProtocol {
+        NotificationCenter.default.addObserver(
+            forName: AVAudioSession.interruptionNotification, object: nil, queue: nil
+        ) { notification in
+            let type = notification.userInfo?[AVAudioSessionInterruptionTypeKey] as? UInt
+            guard type == AVAudioSession.InterruptionType.began.rawValue else { return }
+            Task { @MainActor in
+                onBegan()
+            }
+        }
+    }
+
+    private nonisolated static func observeLostInput(
+        _ onLost: @escaping @MainActor () -> Void
+    ) -> NSObjectProtocol {
+        NotificationCenter.default.addObserver(
+            forName: AVAudioSession.routeChangeNotification, object: nil, queue: nil
+        ) { notification in
+            let reason = notification.userInfo?[AVAudioSessionRouteChangeReasonKey] as? UInt
+            guard reason == AVAudioSession.RouteChangeReason.oldDeviceUnavailable.rawValue else { return }
+            Task { @MainActor in
+                onLost()
             }
         }
     }

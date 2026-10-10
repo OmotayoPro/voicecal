@@ -27,6 +27,8 @@ final class CalculatorViewModel {
     let equation = Equation()
 
     private(set) var isListening = false
+    /// While the mic is about to stop by itself: 1 down to 0. Nil otherwise.
+    private(set) var micCountdown: Double?
     private(set) var micNotice: MicNotice?
     /// Set when equals fails for a reason worth telling the user; cleared by the next input.
     private(set) var errorMessage: String?
@@ -36,16 +38,26 @@ final class CalculatorViewModel {
     /// How long speech must pause before pending tokens are committed.
     private let pauseBeforeCommit: Duration
     private var pauseTask: Task<Void, Never>?
+    private let inactivityTimer = InactivityTimer()
+    var inactivityPolicy: InactivityPolicy
 
-    init(speech: SpeechRecognizing? = nil, pauseBeforeCommit: Duration = .milliseconds(800)) {
+    init(
+        speech: SpeechRecognizing? = nil,
+        pauseBeforeCommit: Duration = .milliseconds(800),
+        inactivityPolicy: InactivityPolicy = InactivityPolicy()
+    ) {
         self.speech = speech
         self.pauseBeforeCommit = pauseBeforeCommit
+        self.inactivityPolicy = inactivityPolicy
         dictation = DictationSession(equation: equation)
         dictation.onCommand = { [weak self] command in
             self?.run(command)
         }
         speech?.onEvent = { [weak self] event in
             self?.handle(event)
+        }
+        inactivityTimer.onChange = { [weak self] deadline in
+            self?.handle(deadline)
         }
     }
 
@@ -117,6 +129,7 @@ final class CalculatorViewModel {
     private func prepareForManualEdit() {
         errorMessage = nil
         commitDictation()
+        inactivityTimer.noteActivity()
     }
 
     // MARK: - Mic
@@ -144,6 +157,7 @@ final class CalculatorViewModel {
             do {
                 try speech.start()
                 isListening = true
+                inactivityTimer.start(policy: inactivityPolicy)
             } catch {
                 micNotice = .unavailable
             }
@@ -171,6 +185,7 @@ final class CalculatorViewModel {
             guard isListening else { return }
             if dictation.update(transcript: text) {
                 errorMessage = nil
+                inactivityTimer.noteActivity()
                 scheduleCommitAfterPause()
             }
             if isFinal {
@@ -184,10 +199,21 @@ final class CalculatorViewModel {
         }
     }
 
+    /// Commits what was heard and returns the mic to idle. Any edit in progress is kept.
     private func finishListening() {
         pauseTask?.cancel()
         dictation.startNewSegment()
+        inactivityTimer.stop()
+        micCountdown = nil
         isListening = false
+    }
+
+    private func handle(_ deadline: ListeningDeadline) {
+        switch deadline {
+        case .active: micCountdown = nil
+        case let .closing(remaining): micCountdown = remaining
+        case .expired: stopListening()
+        }
     }
 
     private func commitDictation() {

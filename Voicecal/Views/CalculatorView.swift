@@ -2,6 +2,7 @@ import SwiftUI
 
 struct CalculatorView: View {
     @State private var viewModel: CalculatorViewModel
+    @Environment(\.scenePhase) private var scenePhase
 
     @MainActor
     init(viewModel: CalculatorViewModel? = nil) {
@@ -20,12 +21,22 @@ struct CalculatorView: View {
 
             display
 
-            KeypadView(isListening: viewModel.isListening, onKey: viewModel.handle)
+            KeypadView(
+                isListening: viewModel.isListening,
+                micCountdown: viewModel.micCountdown,
+                onKey: viewModel.handle
+            )
         }
         .padding(.horizontal, DesignTokens.Spacing.screenHorizontal)
         .padding(.bottom, DesignTokens.Spacing.screenBottom)
         .background(DesignTokens.Colors.surface.ignoresSafeArea())
         .sensoryFeedback(.impact(weight: .light), trigger: viewModel.isListening)
+        .onChange(of: scenePhase) { _, phase in
+            if phase != .active {
+                viewModel.stopListening()
+            }
+        }
+        .onDisappear(perform: viewModel.stopListening)
     }
 
     private var display: some View {

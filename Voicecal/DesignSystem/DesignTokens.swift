@@ -46,6 +46,7 @@ enum DesignTokens {
         static let key: CGFloat = 84
         static let toolbarButton: CGFloat = 40
         static let keyRing: CGFloat = 1
+        static let countdownRing: CGFloat = 3
         static let minTapTarget: CGFloat = 44
         static let cursorWidth: CGFloat = 2
         static let cursorHeight: CGFloat = 60
