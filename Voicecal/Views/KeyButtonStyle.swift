@@ -10,13 +10,15 @@ enum KeyKind {
 struct KeyButtonStyle: ButtonStyle {
     let kind: KeyKind
     var size: CGFloat = DesignTokens.Size.key
+    /// The persistent listening look of the mic key.
+    var isGlowing = false
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(DesignTokens.Typography.key)
             .foregroundStyle(DesignTokens.Colors.textPrimary)
             .frame(width: size, height: size)
-            .background(KeySurface(kind: kind, isPressed: configuration.isPressed))
+            .background(KeySurface(kind: kind, isPressed: configuration.isPressed, isGlowing: isGlowing))
             .contentShape(Circle())
     }
 }
@@ -24,6 +26,7 @@ struct KeyButtonStyle: ButtonStyle {
 private struct KeySurface: View {
     let kind: KeyKind
     let isPressed: Bool
+    let isGlowing: Bool
 
     var body: some View {
         ZStack {
@@ -40,9 +43,14 @@ private struct KeySurface: View {
                     )
                 )
             }
+            if isGlowing {
+                MicGlowView()
+            }
             edgeHighlight(offset: highlightWidth, opacity: topHighlightOpacity)
             edgeHighlight(offset: -highlightWidth, opacity: bottomHighlightOpacity)
         }
+        // One clip for the whole stack, so the glow blends with the fill beneath it.
+        .clipShape(Circle())
         .overlay(
             Circle()
                 .strokeBorder(ring, lineWidth: DesignTokens.Size.keyRing)

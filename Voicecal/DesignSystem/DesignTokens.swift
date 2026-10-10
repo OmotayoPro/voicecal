@@ -62,9 +62,21 @@ enum DesignTokens {
         static let edgeHighlightBottom: Double = 0.3
     }
 
+    /// Blob colors and blur of the listening mic key.
+    enum MicGlow {
+        static let light = Color(.buttonsPrimaryHover)
+        static let core = Color(.buttonsPrimaryDefault)
+        static let deep = Color(.yellow900)
+        static let blur: CGFloat = 10
+        static let spreadScale: CGFloat = 1.5
+        static let spreadBlur: CGFloat = 10
+        static let spreadOpacity: Double = 0.3
+    }
+
     enum Typography {
         static let display = Font.system(size: 64, weight: .regular)
         static let key = Font.system(size: 32, weight: .medium)
         static let liveResult = Font.system(size: 28, weight: .regular)
+        static let notice = Font.footnote
     }
 }

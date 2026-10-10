@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct KeypadView: View {
+    var isListening = false
     let onKey: (KeypadKey) -> Void
 
     var body: some View {
@@ -16,8 +17,8 @@ struct KeypadView: View {
                         } label: {
                             key.label
                         }
-                        .buttonStyle(KeyButtonStyle(kind: key.kind))
-                        .accessibilityLabel(key.accessibilityLabel)
+                        .buttonStyle(KeyButtonStyle(kind: key.kind, isGlowing: key == .mic && isListening))
+                        .accessibilityLabel(key == .mic && isListening ? "Stop listening" : key.accessibilityLabel)
                     }
                 }
             }

@@ -1,6 +1,7 @@
 import Testing
 @testable import Voicecal
 
+@MainActor
 struct CalculatorViewModelTests {
     private func texts(_ viewModel: CalculatorViewModel) -> [String] {
         viewModel.equation.tokens.map(\.text)
@@ -102,10 +103,5 @@ struct CalculatorViewModelTests {
         let viewModel = makeViewModel(typing: .digit(5), .add, .equals)
         #expect(texts(viewModel) == ["5", "+"])
         #expect(viewModel.errorMessage == nil)
-    }
-
-    @Test func micDoesNotChangeTheEquationYet() {
-        let viewModel = makeViewModel(typing: .digit(1), .mic)
-        #expect(texts(viewModel) == ["1"])
     }
 }

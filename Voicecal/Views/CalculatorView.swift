@@ -3,8 +3,9 @@ import SwiftUI
 struct CalculatorView: View {
     @State private var viewModel: CalculatorViewModel
 
-    init(viewModel: CalculatorViewModel = CalculatorViewModel()) {
-        _viewModel = State(initialValue: viewModel)
+    @MainActor
+    init(viewModel: CalculatorViewModel? = nil) {
+        _viewModel = State(initialValue: viewModel ?? CalculatorViewModel())
     }
 
     var body: some View {
@@ -13,13 +14,18 @@ struct CalculatorView: View {
             Color.clear
                 .frame(height: DesignTokens.Size.toolbarButton)
 
+            if let notice = viewModel.micNotice {
+                MicNoticeView(notice: notice, onDismiss: viewModel.dismissMicNotice)
+            }
+
             display
 
-            KeypadView(onKey: viewModel.handle)
+            KeypadView(isListening: viewModel.isListening, onKey: viewModel.handle)
         }
         .padding(.horizontal, DesignTokens.Spacing.screenHorizontal)
         .padding(.bottom, DesignTokens.Spacing.screenBottom)
         .background(DesignTokens.Colors.surface.ignoresSafeArea())
+        .sensoryFeedback(.impact(weight: .light), trigger: viewModel.isListening)
     }
 
     private var display: some View {
@@ -43,6 +49,7 @@ struct CalculatorView: View {
                 }
                 EquationRowView(
                     equation: viewModel.equation,
+                    isListening: viewModel.isListening,
                     onTapToken: viewModel.tapToken,
                     onTapGap: viewModel.tapGap
                 )
