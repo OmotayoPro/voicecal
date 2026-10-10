@@ -1,0 +1,4 @@
+--swiftversion 5.9
+# SwiftLint's default trailing_comma rule forbids them
+--disable trailingCommas
+--exclude build

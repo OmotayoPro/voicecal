@@ -1,0 +1,464 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		175040CBEA7ADBB1D3B2A5DF /* CalculatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48077FFEF665F8A506468C30 /* CalculatorView.swift */; };
+		28C952AAB71C7ABBB876563E /* KeypadLayoutTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87B9B9551E2F911617C585EE /* KeypadLayoutTests.swift */; };
+		4FE2934CF19593D70855751B /* VoicecalApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5833E6C1DC75CC9CD7F80769 /* VoicecalApp.swift */; };
+		6A133AD73E643E09F60DBFE2 /* DesignTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA7DA4E734A86B1511192D4E /* DesignTokens.swift */; };
+		AFB24A5E908B9A75DE7C8982 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 957A0B228B471248ACD9962E /* Assets.xcassets */; };
+		B34690FF7E6CF66015EE3FCB /* KeypadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAF2EBAA0E99F6E6441DA530 /* KeypadView.swift */; };
+		BA6ACC406BA47FB1D61AEABF /* KeyButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEBD186F246FB41422495E24 /* KeyButtonStyle.swift */; };
+		C2030F4FEA3411E41AF1F086 /* KeypadKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7C9E5DC4E6C6AB81D7424D2 /* KeypadKey.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		21FB9E43B033436895E5088B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B3DA269965DA68B230246F80 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DBD9A22F27D29F09AEAD1AAC;
+			remoteInfo = Voicecal;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		48077FFEF665F8A506468C30 /* CalculatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalculatorView.swift; sourceTree = "<group>"; };
+		5833E6C1DC75CC9CD7F80769 /* VoicecalApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoicecalApp.swift; sourceTree = "<group>"; };
+		87B9B9551E2F911617C585EE /* KeypadLayoutTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeypadLayoutTests.swift; sourceTree = "<group>"; };
+		87DC400741A6FF0161F94089 /* VoicecalTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = VoicecalTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		957A0B228B471248ACD9962E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		BA7DA4E734A86B1511192D4E /* DesignTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignTokens.swift; sourceTree = "<group>"; };
+		BAF2EBAA0E99F6E6441DA530 /* KeypadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeypadView.swift; sourceTree = "<group>"; };
+		D7C9E5DC4E6C6AB81D7424D2 /* KeypadKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeypadKey.swift; sourceTree = "<group>"; };
+		D852E7A75F4249C34C06787C /* Voicecal.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Voicecal.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		FEBD186F246FB41422495E24 /* KeyButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyButtonStyle.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		0659081C40BBBCF0080848A1 /* DesignSystem */ = {
+			isa = PBXGroup;
+			children = (
+				BA7DA4E734A86B1511192D4E /* DesignTokens.swift */,
+			);
+			path = DesignSystem;
+			sourceTree = "<group>";
+		};
+		1A851C2C9E32EE7793A05597 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				D7C9E5DC4E6C6AB81D7424D2 /* KeypadKey.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		2D8721F93C79A592E88B78B0 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D852E7A75F4249C34C06787C /* Voicecal.app */,
+				87DC400741A6FF0161F94089 /* VoicecalTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		509580B1AF05F82E142ABE0C /* VoicecalTests */ = {
+			isa = PBXGroup;
+			children = (
+				87B9B9551E2F911617C585EE /* KeypadLayoutTests.swift */,
+			);
+			path = VoicecalTests;
+			sourceTree = "<group>";
+		};
+		555B5805B7626BB55E9AE5CE = {
+			isa = PBXGroup;
+			children = (
+				64407ED88C08862DBDA4878F /* Voicecal */,
+				509580B1AF05F82E142ABE0C /* VoicecalTests */,
+				2D8721F93C79A592E88B78B0 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		64407ED88C08862DBDA4878F /* Voicecal */ = {
+			isa = PBXGroup;
+			children = (
+				957A0B228B471248ACD9962E /* Assets.xcassets */,
+				FB039E2C5AA9D0FF6C6FBE2C /* App */,
+				0659081C40BBBCF0080848A1 /* DesignSystem */,
+				1A851C2C9E32EE7793A05597 /* Models */,
+				E985A2C06C3F353EF8419EDD /* Views */,
+			);
+			path = Voicecal;
+			sourceTree = "<group>";
+		};
+		E985A2C06C3F353EF8419EDD /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				48077FFEF665F8A506468C30 /* CalculatorView.swift */,
+				FEBD186F246FB41422495E24 /* KeyButtonStyle.swift */,
+				BAF2EBAA0E99F6E6441DA530 /* KeypadView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		FB039E2C5AA9D0FF6C6FBE2C /* App */ = {
+			isa = PBXGroup;
+			children = (
+				5833E6C1DC75CC9CD7F80769 /* VoicecalApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		B7F2269A1F681BD91CF961F5 /* VoicecalTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 26562CBAA5226E3B1794BF7F /* Build configuration list for PBXNativeTarget "VoicecalTests" */;
+			buildPhases = (
+				40F7D07333D049592B278646 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E4D2EA7135E13765E2B70D79 /* PBXTargetDependency */,
+			);
+			name = VoicecalTests;
+			packageProductDependencies = (
+			);
+			productName = VoicecalTests;
+			productReference = 87DC400741A6FF0161F94089 /* VoicecalTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		DBD9A22F27D29F09AEAD1AAC /* Voicecal */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 54C29C6C8AD335F21731A214 /* Build configuration list for PBXNativeTarget "Voicecal" */;
+			buildPhases = (
+				E79E898433D8DFDBC2E6A9BE /* Sources */,
+				BCA2752D395D25EBFFC1F3DD /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Voicecal;
+			packageProductDependencies = (
+			);
+			productName = Voicecal;
+			productReference = D852E7A75F4249C34C06787C /* Voicecal.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		B3DA269965DA68B230246F80 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+				};
+			};
+			buildConfigurationList = 387F80DE60D4A4D9FB3A9A1A /* Build configuration list for PBXProject "Voicecal" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 555B5805B7626BB55E9AE5CE;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 2D8721F93C79A592E88B78B0 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				DBD9A22F27D29F09AEAD1AAC /* Voicecal */,
+				B7F2269A1F681BD91CF961F5 /* VoicecalTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		BCA2752D395D25EBFFC1F3DD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AFB24A5E908B9A75DE7C8982 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		40F7D07333D049592B278646 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				28C952AAB71C7ABBB876563E /* KeypadLayoutTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E79E898433D8DFDBC2E6A9BE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				175040CBEA7ADBB1D3B2A5DF /* CalculatorView.swift in Sources */,
+				6A133AD73E643E09F60DBFE2 /* DesignTokens.swift in Sources */,
+				BA6ACC406BA47FB1D61AEABF /* KeyButtonStyle.swift in Sources */,
+				C2030F4FEA3411E41AF1F086 /* KeypadKey.swift in Sources */,
+				B34690FF7E6CF66015EE3FCB /* KeypadView.swift in Sources */,
+				4FE2934CF19593D70855751B /* VoicecalApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		E4D2EA7135E13765E2B70D79 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DBD9A22F27D29F09AEAD1AAC /* Voicecal */;
+			targetProxy = 21FB9E43B033436895E5088B /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		1BF662870D2616BC297487EA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Voicecal;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Used so you can dictate calculations by voice.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Used to turn your spoken numbers and operators into an equation.";
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.omotayotaiwo.voicecal;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		3DF1DD69A60379BA62C6C23B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.omotayotaiwo.voicecal.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Voicecal.app/Voicecal";
+			};
+			name = Release;
+		};
+		7B5FDACCD6788F8B01F7618A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Voicecal;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Used so you can dictate calculations by voice.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Used to turn your spoken numbers and operators into an equation.";
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.omotayotaiwo.voicecal;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		A4102E520AEBF55E96A6DD58 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		A6B8462B510E8B82C598B77D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		FDD8A17A7B07F4E374EEF43A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.omotayotaiwo.voicecal.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Voicecal.app/Voicecal";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		26562CBAA5226E3B1794BF7F /* Build configuration list for PBXNativeTarget "VoicecalTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FDD8A17A7B07F4E374EEF43A /* Debug */,
+				3DF1DD69A60379BA62C6C23B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		387F80DE60D4A4D9FB3A9A1A /* Build configuration list for PBXProject "Voicecal" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A4102E520AEBF55E96A6DD58 /* Debug */,
+				A6B8462B510E8B82C598B77D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		54C29C6C8AD335F21731A214 /* Build configuration list for PBXNativeTarget "Voicecal" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1BF662870D2616BC297487EA /* Debug */,
+				7B5FDACCD6788F8B01F7618A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = B3DA269965DA68B230246F80 /* Project object */;
+}

@@ -1,0 +1,48 @@
+name: Voicecal
+options:
+  bundleIdPrefix: com.omotayotaiwo
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "1"
+targets:
+  Voicecal:
+    type: application
+    platform: iOS
+    sources: [Voicecal]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.omotayotaiwo.voicecal
+        TARGETED_DEVICE_FAMILY: "1"
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Voicecal
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
+        INFOPLIST_KEY_NSMicrophoneUsageDescription: "Used so you can dictate calculations by voice."
+        INFOPLIST_KEY_NSSpeechRecognitionUsageDescription: "Used to turn your spoken numbers and operators into an equation."
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+  VoicecalTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources: [VoicecalTests]
+    dependencies:
+      - target: Voicecal
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.omotayotaiwo.voicecal.tests
+        GENERATE_INFOPLIST_FILE: YES
+schemes:
+  Voicecal:
+    build:
+      targets:
+        Voicecal: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets: [VoicecalTests]
