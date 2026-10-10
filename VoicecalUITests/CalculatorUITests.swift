@@ -31,6 +31,15 @@ final class CalculatorUITests: XCTestCase {
         snapshot("long")
     }
 
+    func testTappingBetweenTokensMovesTheCursorThere() {
+        tap("1", "2", "Add", "3")
+        let plus = app.buttons["Token 2 of 3, operator plus"]
+        plus.coordinate(withNormalizedOffset: CGVector(dx: 0, dy: 0.5)).tap()
+        tap("9")
+        XCTAssertTrue(app.buttons["Token 1 of 3, number 129"].exists)
+        snapshot("cursor-mid")
+    }
+
     func testClearReturnsToEmptyState() {
         tap("5", "Add", "Clear all")
         XCTAssertTrue(app.staticTexts["Empty equation"].exists)

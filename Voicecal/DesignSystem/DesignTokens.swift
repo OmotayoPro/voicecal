@@ -36,9 +36,10 @@ enum DesignTokens {
         static let section: CGFloat = 8
         static let keypadRow: CGFloat = 10
         static let displayPadding: CGFloat = 8
-        /// Tappable gap between tokens; the cursor sits inside it.
-        static let tokenGap: CGFloat = 10
-        static let chipHorizontal: CGFloat = 4
+        /// Width of the invisible tap strip centred on each token boundary. Tokens themselves sit flush.
+        static let cursorTapWidth: CGFloat = 16
+        /// How far the focused-token box extends past the glyphs.
+        static let chipOutset: CGFloat = 3
     }
 
     enum Size {
