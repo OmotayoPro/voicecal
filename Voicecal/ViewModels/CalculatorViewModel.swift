@@ -39,16 +39,27 @@ final class CalculatorViewModel {
     private let pauseBeforeCommit: Duration
     private var pauseTask: Task<Void, Never>?
     private let inactivityTimer = InactivityTimer()
-    var inactivityPolicy: InactivityPolicy
+    /// Replaces the policy derived from settings. Used by tests.
+    private let inactivityPolicyOverride: InactivityPolicy?
+    private let speaker: ResultSpeaking?
+    /// True while recognition is paused so the app does not hear itself reading the answer.
+    private var isPausedForSpeech = false
+
+    let settings: VoiceSettings
+    private(set) var isSpeaking = false
 
     init(
         speech: SpeechRecognizing? = nil,
+        speaker: ResultSpeaking? = nil,
+        settings: VoiceSettings = VoiceSettings(),
         pauseBeforeCommit: Duration = .milliseconds(800),
-        inactivityPolicy: InactivityPolicy = InactivityPolicy()
+        inactivityPolicy: InactivityPolicy? = nil
     ) {
         self.speech = speech
+        self.speaker = speaker
+        self.settings = settings
         self.pauseBeforeCommit = pauseBeforeCommit
-        self.inactivityPolicy = inactivityPolicy
+        inactivityPolicyOverride = inactivityPolicy
         dictation = DictationSession(equation: equation)
         dictation.onCommand = { [weak self] command in
             self?.run(command)
@@ -115,19 +126,26 @@ final class CalculatorViewModel {
         switch ExpressionEvaluator.evaluate(equation.tokens) {
         case let .success(value):
             equation.showResult(ResultFormatter.string(from: value))
+            announce(SpokenResultFormatter.phrase(for: value))
         case .failure(.divideByZero):
-            errorMessage = "Can't divide by zero"
+            report("Can't divide by zero")
         case .failure(.overflow):
-            errorMessage = "Number too large"
+            report("Number too large")
         case .failure(.malformed):
             break // Incomplete entry: leave it for the user to finish.
         }
+    }
+
+    private func report(_ message: String) {
+        errorMessage = message
+        announce(message)
     }
 
     /// A manual edit never stops the mic. What was heard so far is committed first, so the edit
     /// cannot be overwritten by a later revision and dictation carries on from the new cursor.
     private func prepareForManualEdit() {
         errorMessage = nil
+        interruptSpeaking()
         commitDictation()
         inactivityTimer.noteActivity()
     }
@@ -169,8 +187,14 @@ final class CalculatorViewModel {
 
     func stopListening() {
         guard isListening else { return }
-        speech?.stop()
+        if !isPausedForSpeech {
+            speech?.stop()
+        }
         finishListening()
+    }
+
+    private var inactivityPolicy: InactivityPolicy {
+        inactivityPolicyOverride ?? InactivityPolicy(timeout: settings.inactivityTimeout.duration)
     }
 
     func dismissMicNotice() {
@@ -182,7 +206,7 @@ final class CalculatorViewModel {
     private func handle(_ event: SpeechEvent) {
         switch event {
         case let .transcript(text, isFinal):
-            guard isListening else { return }
+            guard isListening, !isPausedForSpeech else { return }
             if dictation.update(transcript: text) {
                 errorMessage = nil
                 inactivityTimer.noteActivity()
@@ -205,6 +229,7 @@ final class CalculatorViewModel {
         dictation.startNewSegment()
         inactivityTimer.stop()
         micCountdown = nil
+        isPausedForSpeech = false
         isListening = false
     }
 
@@ -227,6 +252,47 @@ final class CalculatorViewModel {
             try? await Task.sleep(for: pauseBeforeCommit)
             guard !Task.isCancelled else { return }
             self?.commitDictation()
+        }
+    }
+
+    // MARK: - Speaking the result
+
+    /// Reads `phrase` aloud if the user wants results spoken. Recognition is paused meanwhile,
+    /// so the app does not transcribe its own voice, and resumes afterwards if the mic was on.
+    private func announce(_ phrase: String) {
+        guard settings.speaksResult, let speaker else { return }
+        if isListening, !isPausedForSpeech {
+            pauseTask?.cancel()
+            dictation.startNewSegment()
+            speech?.stop()
+            inactivityTimer.stop()
+            micCountdown = nil
+            isPausedForSpeech = true
+        }
+        isSpeaking = true
+        speaker.speak(phrase, settings: settings) { [weak self] in
+            self?.finishedSpeaking()
+        }
+    }
+
+    private func interruptSpeaking() {
+        guard isSpeaking else { return }
+        speaker?.stop()
+        finishedSpeaking()
+    }
+
+    private func finishedSpeaking() {
+        isSpeaking = false
+        guard isPausedForSpeech else { return }
+        isPausedForSpeech = false
+        guard isListening else { return }
+        do {
+            try speech?.start()
+            // Resuming counts as activity: the countdown starts over.
+            inactivityTimer.start(policy: inactivityPolicy)
+        } catch {
+            finishListening()
+            micNotice = .unavailable
         }
     }
 
