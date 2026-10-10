@@ -9,10 +9,13 @@
 /* Begin PBXBuildFile section */
 		175040CBEA7ADBB1D3B2A5DF /* CalculatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48077FFEF665F8A506468C30 /* CalculatorView.swift */; };
 		28C952AAB71C7ABBB876563E /* KeypadLayoutTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87B9B9551E2F911617C585EE /* KeypadLayoutTests.swift */; };
+		39177E992514CC4A1DB04126 /* EquationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A40FAEB223D3336645FE472 /* EquationTests.swift */; };
 		4FE2934CF19593D70855751B /* VoicecalApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5833E6C1DC75CC9CD7F80769 /* VoicecalApp.swift */; };
+		5DA219D021FF890FAE9082D3 /* Token.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEAEFCD6347F0202C3011E90 /* Token.swift */; };
 		6A133AD73E643E09F60DBFE2 /* DesignTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA7DA4E734A86B1511192D4E /* DesignTokens.swift */; };
 		AFB24A5E908B9A75DE7C8982 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 957A0B228B471248ACD9962E /* Assets.xcassets */; };
 		B34690FF7E6CF66015EE3FCB /* KeypadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAF2EBAA0E99F6E6441DA530 /* KeypadView.swift */; };
+		B3B7D404B4F5139B165434C1 /* Equation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E4FA0740C7097AA08213D89 /* Equation.swift */; };
 		BA6ACC406BA47FB1D61AEABF /* KeyButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEBD186F246FB41422495E24 /* KeyButtonStyle.swift */; };
 		C2030F4FEA3411E41AF1F086 /* KeypadKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7C9E5DC4E6C6AB81D7424D2 /* KeypadKey.swift */; };
 /* End PBXBuildFile section */
@@ -29,7 +32,9 @@
 
 /* Begin PBXFileReference section */
 		48077FFEF665F8A506468C30 /* CalculatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalculatorView.swift; sourceTree = "<group>"; };
+		4E4FA0740C7097AA08213D89 /* Equation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Equation.swift; sourceTree = "<group>"; };
 		5833E6C1DC75CC9CD7F80769 /* VoicecalApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoicecalApp.swift; sourceTree = "<group>"; };
+		6A40FAEB223D3336645FE472 /* EquationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EquationTests.swift; sourceTree = "<group>"; };
 		87B9B9551E2F911617C585EE /* KeypadLayoutTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeypadLayoutTests.swift; sourceTree = "<group>"; };
 		87DC400741A6FF0161F94089 /* VoicecalTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = VoicecalTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		957A0B228B471248ACD9962E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -37,6 +42,7 @@
 		BAF2EBAA0E99F6E6441DA530 /* KeypadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeypadView.swift; sourceTree = "<group>"; };
 		D7C9E5DC4E6C6AB81D7424D2 /* KeypadKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeypadKey.swift; sourceTree = "<group>"; };
 		D852E7A75F4249C34C06787C /* Voicecal.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Voicecal.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DEAEFCD6347F0202C3011E90 /* Token.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Token.swift; sourceTree = "<group>"; };
 		FEBD186F246FB41422495E24 /* KeyButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyButtonStyle.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -52,7 +58,9 @@
 		1A851C2C9E32EE7793A05597 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				4E4FA0740C7097AA08213D89 /* Equation.swift */,
 				D7C9E5DC4E6C6AB81D7424D2 /* KeypadKey.swift */,
+				DEAEFCD6347F0202C3011E90 /* Token.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -69,6 +77,7 @@
 		509580B1AF05F82E142ABE0C /* VoicecalTests */ = {
 			isa = PBXGroup;
 			children = (
+				6A40FAEB223D3336645FE472 /* EquationTests.swift */,
 				87B9B9551E2F911617C585EE /* KeypadLayoutTests.swift */,
 			);
 			path = VoicecalTests;
@@ -199,6 +208,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				39177E992514CC4A1DB04126 /* EquationTests.swift in Sources */,
 				28C952AAB71C7ABBB876563E /* KeypadLayoutTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -209,9 +219,11 @@
 			files = (
 				175040CBEA7ADBB1D3B2A5DF /* CalculatorView.swift in Sources */,
 				6A133AD73E643E09F60DBFE2 /* DesignTokens.swift in Sources */,
+				B3B7D404B4F5139B165434C1 /* Equation.swift in Sources */,
 				BA6ACC406BA47FB1D61AEABF /* KeyButtonStyle.swift in Sources */,
 				C2030F4FEA3411E41AF1F086 /* KeypadKey.swift in Sources */,
 				B34690FF7E6CF66015EE3FCB /* KeypadView.swift in Sources */,
+				5DA219D021FF890FAE9082D3 /* Token.swift in Sources */,
 				4FE2934CF19593D70855751B /* VoicecalApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

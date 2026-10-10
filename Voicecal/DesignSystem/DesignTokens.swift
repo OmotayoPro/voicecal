@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Values extracted from the Figma file (Pro Playground › ios-calculator-ui).
+/// Values extracted from the Figma file (Pro Playground › ios-calculator-ui_by OmotayoTaiwo).
 /// Colors live in `Assets.xcassets/Colors`, named after their Figma variables.
 enum DesignTokens {
     enum Colors {
