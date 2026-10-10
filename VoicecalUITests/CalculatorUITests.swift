@@ -88,6 +88,18 @@ final class CalculatorUITests: XCTestCase {
         snapshot("dictated-then-typed")
     }
 
+    func testMicTurnsItselfOffAfterInactivity() {
+        app.launchEnvironment["UITEST_SPEECH_SCRIPT"] = "eight"
+        app.launchEnvironment["UITEST_INACTIVITY_SECONDS"] = "5"
+        app.launch()
+        tap("Start listening")
+        XCTAssertTrue(app.buttons["Token 1 of 1, number 8"].waitForExistence(timeout: 3))
+        sleep(3)
+        snapshot("countdown")
+        XCTAssertTrue(app.buttons["Start listening"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Token 1 of 1, number 8"].exists)
+    }
+
     /// Exercises the real recognizer. Opt in with TEST_RUNNER_REAL_MIC=1 after granting
     /// microphone and speech-recognition access to the app.
     func testRealMicSmoke() throws {

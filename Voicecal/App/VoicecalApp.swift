@@ -2,7 +2,7 @@ import SwiftUI
 
 @main
 struct VoicecalApp: App {
-    @State private var viewModel = CalculatorViewModel(speech: makeSpeechRecognizer())
+    @State private var viewModel = makeViewModel()
 
     var body: some Scene {
         WindowGroup {
@@ -11,12 +11,21 @@ struct VoicecalApp: App {
         }
     }
 
-    private static func makeSpeechRecognizer() -> SpeechRecognizing {
+    @MainActor
+    private static func makeViewModel() -> CalculatorViewModel {
         #if DEBUG
-            if let script = ProcessInfo.processInfo.environment[ScriptedSpeechRecognizer.environmentKey] {
-                return ScriptedSpeechRecognizer(script: script)
+            // UI tests swap in a scripted recognizer and can shorten the inactivity timeout.
+            let environment = ProcessInfo.processInfo.environment
+            if let script = environment[ScriptedSpeechRecognizer.environmentKey] {
+                var policy = InactivityPolicy()
+                if let seconds = environment["UITEST_INACTIVITY_SECONDS"].flatMap(Double.init) {
+                    policy.timeout = .seconds(seconds)
+                }
+                return CalculatorViewModel(
+                    speech: ScriptedSpeechRecognizer(script: script), inactivityPolicy: policy
+                )
             }
         #endif
-        return SpeechRecognizerService()
+        return CalculatorViewModel(speech: SpeechRecognizerService())
     }
 }

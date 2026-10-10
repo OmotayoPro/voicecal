@@ -2,6 +2,7 @@ import SwiftUI
 
 struct KeypadView: View {
     var isListening = false
+    var micCountdown: Double?
     let onKey: (KeypadKey) -> Void
 
     var body: some View {
@@ -18,11 +19,35 @@ struct KeypadView: View {
                             key.label
                         }
                         .buttonStyle(KeyButtonStyle(kind: key.kind, isGlowing: key == .mic && isListening))
+                        .overlay {
+                            if key == .mic, let micCountdown {
+                                CountdownRing(remaining: micCountdown)
+                            }
+                        }
                         .accessibilityLabel(key == .mic && isListening ? "Stop listening" : key.accessibilityLabel)
                     }
                 }
             }
         }
+    }
+}
+
+/// Drains around the mic key in the last seconds before listening stops by itself.
+private struct CountdownRing: View {
+    let remaining: Double
+
+    var body: some View {
+        Circle()
+            .trim(from: 0, to: remaining)
+            .stroke(
+                DesignTokens.Colors.textPrimary,
+                style: StrokeStyle(lineWidth: DesignTokens.Size.countdownRing, lineCap: .round)
+            )
+            .rotationEffect(.degrees(-90))
+            .padding(DesignTokens.Size.countdownRing / 2)
+            .animation(.linear(duration: 0.05), value: remaining)
+            .allowsHitTesting(false)
+            .accessibilityHidden(true)
     }
 }
 
