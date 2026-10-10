@@ -5,3 +5,6 @@ DerivedData/
 build/
 .build/
 .swiftpm/
+
+# Generated from project.yml by XcodeGen
+*.xcodeproj
