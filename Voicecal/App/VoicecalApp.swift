@@ -21,8 +21,11 @@ struct VoicecalApp: App {
                 if let seconds = environment["UITEST_INACTIVITY_SECONDS"].flatMap(Double.init) {
                     policy.timeout = .seconds(seconds)
                 }
+                // A long pause keeps dictated tokens pending long enough for a test to observe them.
                 return CalculatorViewModel(
-                    speech: ScriptedSpeechRecognizer(script: script), inactivityPolicy: policy
+                    speech: ScriptedSpeechRecognizer(script: script),
+                    pauseBeforeCommit: .seconds(3),
+                    inactivityPolicy: policy
                 )
             }
         #endif
