@@ -110,6 +110,11 @@ final class CalculatorViewModel {
         equation.toggleEditing(id: id)
     }
 
+    func deleteToken(id: UUID) {
+        prepareForManualEdit()
+        equation.delete(id: id)
+    }
+
     func tapGap(at index: Int) {
         prepareForManualEdit()
         equation.moveCursor(to: index)

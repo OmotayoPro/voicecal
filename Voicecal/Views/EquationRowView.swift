@@ -5,8 +5,22 @@ struct EquationRowView: View {
     var isListening = false
     let onTapToken: (UUID) -> Void
     let onTapGap: (Int) -> Void
+    var onDeleteToken: (UUID) -> Void = { _ in }
+
+    /// The display size follows the user's text size, up to a cap that still fits the screen.
+    @ScaledMetric(relativeTo: .largeTitle) private var displaySize = DesignTokens.Typography.displaySize
+
+    private var cursorHeight: CGFloat {
+        displaySize * DesignTokens.Size.cursorHeightRatio
+    }
 
     var body: some View {
+        content
+            .font(.system(size: displaySize))
+            .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+    }
+
+    @ViewBuilder private var content: some View {
         if equation.tokens.isEmpty {
             placeholder
         } else {
@@ -25,11 +39,10 @@ struct EquationRowView: View {
     private var placeholder: some View {
         HStack(spacing: 0) {
             Text("0")
-                .font(DesignTokens.Typography.display)
                 .foregroundStyle(DesignTokens.Colors.textPrimary)
                 .accessibilityLabel("Empty equation")
             if isListening {
-                CursorView(isGlowing: true)
+                CursorView(isGlowing: true, height: cursorHeight)
             }
         }
         .padding(.horizontal, DesignTokens.Size.cursorWidth)
@@ -47,7 +60,11 @@ struct EquationRowView: View {
                     TokenChipView(token: token, isEditing: isEditing, isPending: isPending)
                 }
                 .buttonStyle(.plain)
+                .simultaneousGesture(deleteGesture(for: token.id))
                 .accessibilityLabel(accessibilityLabel(for: token, at: index))
+                .accessibilityAction(named: "Delete") {
+                    onDeleteToken(token.id)
+                }
                 .accessibilityHint(isEditing ? "Double tap to stop editing" : "Double tap to edit")
                 .accessibilityValue(isPending ? "pending" : "")
                 .accessibilityAddTraits(isEditing ? .isSelected : [])
@@ -62,10 +79,10 @@ struct EquationRowView: View {
     /// the cursor and a narrow tap strip are drawn over it.
     private func gap(at index: Int) -> some View {
         Color.clear
-            .frame(width: 0, height: DesignTokens.Size.cursorHeight)
+            .frame(width: 0, height: cursorHeight)
             .overlay {
                 Color.clear
-                    .frame(width: DesignTokens.Spacing.cursorTapWidth, height: DesignTokens.Size.cursorHeight)
+                    .frame(width: DesignTokens.Spacing.cursorTapWidth, height: cursorHeight)
                     .contentShape(Rectangle())
                     .onTapGesture {
                         onTapGap(index)
@@ -73,12 +90,20 @@ struct EquationRowView: View {
             }
             .overlay {
                 if equation.cursorIndex == index, equation.editingTokenID == nil {
-                    CursorView(isGlowing: isListening)
+                    CursorView(isGlowing: isListening, height: cursorHeight)
                         .fixedSize()
                         .allowsHitTesting(false)
                 }
             }
             .zIndex(1)
+    }
+
+    private func deleteGesture(for id: UUID) -> some Gesture {
+        LongPressGesture(minimumDuration: 0.5).onEnded { _ in
+            if FeatureFlags.longPressDeletesToken {
+                onDeleteToken(id)
+            }
+        }
     }
 
     private func accessibilityLabel(for token: Token, at index: Int) -> String {

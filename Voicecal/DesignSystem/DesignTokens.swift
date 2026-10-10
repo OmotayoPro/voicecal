@@ -49,7 +49,8 @@ enum DesignTokens {
         static let countdownRing: CGFloat = 3
         static let minTapTarget: CGFloat = 44
         static let cursorWidth: CGFloat = 2
-        static let cursorHeight: CGFloat = 60
+        /// Cursor height as a share of the display font size.
+        static let cursorHeightRatio: CGFloat = 60.0 / 64.0
         static let chipRadius: CGFloat = 14
         static let cursorGlowRadius: CGFloat = 12
         static let cursorGlowOffset: CGFloat = 8
@@ -75,7 +76,8 @@ enum DesignTokens {
     }
 
     enum Typography {
-        static let display = Font.system(size: 64, weight: .regular)
+        /// The display size at the default text size; it scales with Dynamic Type.
+        static let displaySize: CGFloat = 64
         static let key = Font.system(size: 32, weight: .medium)
         static let smallKey = Font.system(size: 16, weight: .medium)
         static let liveResult = Font.system(size: 28, weight: .regular)

@@ -133,6 +133,14 @@ struct DictationTests {
         #expect(equation.cursorIndex == 3)
     }
 
+    @Test func deletingATokenMidSentenceKeepsTheMicOn() {
+        speech.hear("five plus six")
+        viewModel.deleteToken(id: equation.tokens[1].id)
+        #expect(viewModel.isListening)
+        #expect(texts == ["5", "6"])
+        #expect(pendingTexts.isEmpty)
+    }
+
     @Test func movingTheCursorCommitsWhatWasHeard() {
         speech.hear("eight times")
         viewModel.tapGap(at: 0)
