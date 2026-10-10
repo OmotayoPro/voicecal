@@ -40,6 +40,16 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.omotayotaiwo.voicecal.tests
         GENERATE_INFOPLIST_FILE: YES
+  VoicecalUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources: [VoicecalUITests]
+    dependencies:
+      - target: Voicecal
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.omotayotaiwo.voicecal.uitests
+        GENERATE_INFOPLIST_FILE: YES
 schemes:
   Voicecal:
     build:
@@ -49,4 +59,4 @@ schemes:
       config: Debug
     test:
       config: Debug
-      targets: [VoicecalTests]
+      targets: [VoicecalTests, VoicecalUITests]

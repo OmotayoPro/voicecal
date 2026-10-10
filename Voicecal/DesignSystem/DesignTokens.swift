@@ -22,6 +22,10 @@ enum DesignTokens {
 
         /// White highlight used for key gloss and inset edge highlights.
         static let highlight = Color.white
+
+        /// Cursor glow while listening (one-off values on the Figma cursor layer).
+        static let cursorGlowCool = Color(red: 0.663, green: 1, blue: 0.996)
+        static let cursorGlowWarm = Color(red: 0.933, green: 0.624, blue: 0)
     }
 
     enum Spacing {
@@ -32,12 +36,21 @@ enum DesignTokens {
         static let section: CGFloat = 8
         static let keypadRow: CGFloat = 10
         static let displayPadding: CGFloat = 8
+        /// Tappable gap between tokens; the cursor sits inside it.
+        static let tokenGap: CGFloat = 10
+        static let chipHorizontal: CGFloat = 4
     }
 
     enum Size {
         static let key: CGFloat = 84
         static let toolbarButton: CGFloat = 40
         static let keyRing: CGFloat = 1
+        static let minTapTarget: CGFloat = 44
+        static let cursorWidth: CGFloat = 2
+        static let cursorHeight: CGFloat = 60
+        static let chipRadius: CGFloat = 14
+        static let cursorGlowRadius: CGFloat = 12
+        static let cursorGlowOffset: CGFloat = 8
     }
 
     enum Opacity {
