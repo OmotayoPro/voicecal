@@ -29,11 +29,24 @@ struct CalculatorView: View {
                 .contentShape(Rectangle())
                 .onTapGesture(perform: viewModel.tapDisplayBackground)
 
-            EquationRowView(
-                equation: viewModel.equation,
-                onTapToken: viewModel.tapToken,
-                onTapGap: viewModel.tapGap
-            )
+            VStack(alignment: .trailing, spacing: 0) {
+                if let status = viewModel.statusText {
+                    Text(status)
+                        .font(DesignTokens.Typography.liveResult)
+                        .foregroundStyle(
+                            DesignTokens.Colors.textPrimary.opacity(DesignTokens.Opacity.secondaryText)
+                        )
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
+                        .padding(.trailing, DesignTokens.Size.cursorWidth)
+                        .accessibilityIdentifier("status")
+                }
+                EquationRowView(
+                    equation: viewModel.equation,
+                    onTapToken: viewModel.tapToken,
+                    onTapGap: viewModel.tapGap
+                )
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }

@@ -13,6 +13,17 @@ enum KeypadKey: Hashable {
     case backspace
     case mic
 
+    var operatorValue: Operator? {
+        switch self {
+        case .add: .add
+        case .subtract: .subtract
+        case .multiply: .multiply
+        case .divide: .divide
+        case .percent: .percent
+        default: nil
+        }
+    }
+
     /// Rows top to bottom, as laid out in the design.
     static let layout: [[KeypadKey]] = [
         [.backspace, .clear, .percent, .divide],

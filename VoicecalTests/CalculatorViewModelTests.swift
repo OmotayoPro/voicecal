@@ -58,8 +58,54 @@ struct CalculatorViewModelTests {
         #expect(viewModel.equation.cursorIndex == 3)
     }
 
-    @Test func equalsAndMicDoNotChangeTheEquationYet() {
-        let viewModel = makeViewModel(typing: .digit(1), .equals, .mic)
+    @Test func equalsCollapsesToTheResult() {
+        let viewModel = makeViewModel(typing: .digit(1), .digit(2), .add, .digit(3), .equals)
+        #expect(texts(viewModel) == ["15"])
+        #expect(viewModel.equation.cursorIndex == 1)
+        #expect(viewModel.statusText == nil)
+    }
+
+    @Test func operatorAfterEqualsContinuesFromTheResult() {
+        let viewModel = makeViewModel(typing: .digit(6), .multiply, .digit(7), .equals, .subtract, .digit(2))
+        #expect(texts(viewModel) == ["42", "−", "2"])
+    }
+
+    @Test func digitAfterEqualsStartsANewEquation() {
+        let viewModel = makeViewModel(typing: .digit(6), .multiply, .digit(7), .equals, .digit(5))
+        #expect(texts(viewModel) == ["5"])
+    }
+
+    @Test func backspaceAfterEqualsEditsTheResult() {
+        let viewModel = makeViewModel(typing: .digit(6), .multiply, .digit(7), .equals, .backspace, .digit(9))
+        #expect(texts(viewModel) == ["49"])
+    }
+
+    @Test func statusShowsRunningResult() {
+        let viewModel = makeViewModel(typing: .digit(1), .digit(2), .add, .digit(3), .multiply)
+        #expect(viewModel.statusText == "= 15")
+    }
+
+    @Test func negativeRunningResultUsesTypographicMinus() {
+        let viewModel = makeViewModel(typing: .digit(2), .subtract, .digit(5))
+        #expect(viewModel.statusText == "= −3")
+    }
+
+    @Test func divideByZeroOnEqualsShowsMessageUntilNextInput() {
+        let viewModel = makeViewModel(typing: .digit(5), .divide, .digit(0), .equals)
+        #expect(viewModel.statusText == "Can't divide by zero")
+        #expect(texts(viewModel) == ["5", "÷", "0"])
+        viewModel.handle(.backspace)
+        #expect(viewModel.errorMessage == nil)
+    }
+
+    @Test func equalsOnIncompleteEquationDoesNothing() {
+        let viewModel = makeViewModel(typing: .digit(5), .add, .equals)
+        #expect(texts(viewModel) == ["5", "+"])
+        #expect(viewModel.errorMessage == nil)
+    }
+
+    @Test func micDoesNotChangeTheEquationYet() {
+        let viewModel = makeViewModel(typing: .digit(1), .mic)
         #expect(texts(viewModel) == ["1"])
     }
 }

@@ -11,6 +11,13 @@ final class Equation {
     /// Token currently being corrected, if any.
     private(set) var editingTokenID: UUID?
 
+    /// The value so far, ignoring a trailing operator. Nil until there is something to calculate.
+    var liveResult: Decimal? {
+        let candidates = ExpressionEvaluator.trimmingTrailingOperators(tokens)
+        guard candidates.contains(where: { !$0.isNumber }) else { return nil }
+        return try? ExpressionEvaluator.evaluate(candidates).get()
+    }
+
     // MARK: - Whole-token mutations (voice and keypad)
 
     /// Inserts at the cursor. If a token of the same kind is being edited, replaces it instead.
