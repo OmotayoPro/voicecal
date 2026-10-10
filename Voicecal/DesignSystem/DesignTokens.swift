@@ -77,6 +77,7 @@ enum DesignTokens {
     enum Typography {
         static let display = Font.system(size: 64, weight: .regular)
         static let key = Font.system(size: 32, weight: .medium)
+        static let smallKey = Font.system(size: 16, weight: .medium)
         static let liveResult = Font.system(size: 28, weight: .regular)
         static let notice = Font.footnote
     }

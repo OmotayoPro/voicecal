@@ -6,6 +6,7 @@ final class CalculatorUITests: XCTestCase {
     override func setUp() {
         continueAfterFailure = false
         app = XCUIApplication()
+        app.launchEnvironment["UITEST_MODE"] = "1"
     }
 
     func testTypeAnEquationAndCorrectAToken() {
@@ -100,10 +101,40 @@ final class CalculatorUITests: XCTestCase {
         XCTAssertTrue(app.buttons["Token 1 of 1, number 8"].exists)
     }
 
+    func testVoiceSettingsPersistAcrossLaunches() {
+        app.launch()
+        tap("Voice settings")
+        let speak = app.switches["Speak the answer"]
+        XCTAssertTrue(speak.waitForExistence(timeout: 3))
+        XCTAssertEqual(speak.value as? String, "1")
+        snapshot("settings")
+        speak.switches.firstMatch.tap()
+        XCTAssertEqual(speak.value as? String, "0")
+        tap("Done")
+
+        app.terminate()
+        app.launchEnvironment["UITEST_KEEP_SETTINGS"] = "1"
+        app.launch()
+        tap("Voice settings")
+        XCTAssertTrue(speak.waitForExistence(timeout: 3))
+        XCTAssertEqual(speak.value as? String, "0")
+    }
+
+    func testOpeningSettingsTurnsTheMicOff() {
+        app.launchEnvironment["UITEST_SPEECH_SCRIPT"] = ""
+        app.launch()
+        tap("Start listening")
+        XCTAssertTrue(app.buttons["Stop listening"].waitForExistence(timeout: 2))
+        tap("Voice settings")
+        tap("Done")
+        XCTAssertTrue(app.buttons["Start listening"].waitForExistence(timeout: 2))
+    }
+
     /// Exercises the real recognizer. Opt in with TEST_RUNNER_REAL_MIC=1 after granting
     /// microphone and speech-recognition access to the app.
     func testRealMicSmoke() throws {
         try XCTSkipUnless(ProcessInfo.processInfo.environment["REAL_MIC"] == "1")
+        app.launchEnvironment["UITEST_MODE"] = nil
         app.launch()
         tap("Start listening")
         sleep(3)

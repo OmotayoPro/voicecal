@@ -275,6 +275,15 @@ final class CalculatorViewModel {
         }
     }
 
+    /// Speaks a sample with the current voice settings, whether or not answers are spoken.
+    func previewVoice() {
+        speaker?.speak("Forty-two point five", settings: settings) {}
+    }
+
+    func stopPreview() {
+        speaker?.stop()
+    }
+
     private func interruptSpeaking() {
         guard isSpeaking else { return }
         speaker?.stop()

@@ -15,7 +15,7 @@ struct KeyButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(DesignTokens.Typography.key)
+            .font(size == DesignTokens.Size.key ? DesignTokens.Typography.key : DesignTokens.Typography.smallKey)
             .foregroundStyle(DesignTokens.Colors.textPrimary)
             .frame(width: size, height: size)
             .background(KeySurface(kind: kind, isPressed: configuration.isPressed, isGlowing: isGlowing))
