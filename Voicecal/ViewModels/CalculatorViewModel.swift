@@ -1,6 +1,5 @@
 import Foundation
 import Observation
-import OSLog
 
 /// Why the mic could not start. Shown inline; manual input keeps working.
 enum MicNotice: Equatable {
@@ -32,13 +31,19 @@ final class CalculatorViewModel {
     /// Set when equals fails for a reason worth telling the user; cleared by the next input.
     private(set) var errorMessage: String?
 
-    /// True right after equals, while the equation is just the result.
-    private var isShowingResult = false
     private let speech: SpeechRecognizing?
-    private let log = Logger(subsystem: "com.omotayotaiwo.voicecal", category: "speech")
+    private let dictation: DictationSession
+    /// How long speech must pause before pending tokens are committed.
+    private let pauseBeforeCommit: Duration
+    private var pauseTask: Task<Void, Never>?
 
-    init(speech: SpeechRecognizing? = nil) {
+    init(speech: SpeechRecognizing? = nil, pauseBeforeCommit: Duration = .milliseconds(800)) {
         self.speech = speech
+        self.pauseBeforeCommit = pauseBeforeCommit
+        dictation = DictationSession(equation: equation)
+        dictation.onCommand = { [weak self] command in
+            self?.run(command)
+        }
         speech?.onEvent = { [weak self] event in
             self?.handle(event)
         }
@@ -60,26 +65,16 @@ final class CalculatorViewModel {
             toggleMic()
             return
         }
-        errorMessage = nil
+        prepareForManualEdit()
         micNotice = nil
-        let startsFresh = isShowingResult
-        isShowingResult = false
 
         if let value = key.operatorValue {
             equation.typeOperator(value)
             return
         }
         switch key {
-        case let .digit(value):
-            if startsFresh {
-                equation.clear()
-            }
-            equation.typeDigit(value)
-        case .decimalPoint:
-            if startsFresh {
-                equation.clear()
-            }
-            equation.typeDecimalPoint()
+        case let .digit(value): equation.typeDigit(value)
+        case .decimalPoint: equation.typeDecimalPoint()
         case .clear: equation.clear()
         case .backspace: equation.backspace()
         case .equals: evaluate()
@@ -88,17 +83,18 @@ final class CalculatorViewModel {
     }
 
     func tapToken(id: UUID) {
-        isShowingResult = false
+        prepareForManualEdit()
         equation.toggleEditing(id: id)
     }
 
     func tapGap(at index: Int) {
-        isShowingResult = false
+        prepareForManualEdit()
         equation.moveCursor(to: index)
     }
 
     /// Tapping empty display space ends any edit and returns the cursor to the end.
     func tapDisplayBackground() {
+        prepareForManualEdit()
         equation.moveCursor(to: equation.tokens.count)
     }
 
@@ -106,9 +102,7 @@ final class CalculatorViewModel {
     func evaluate() {
         switch ExpressionEvaluator.evaluate(equation.tokens) {
         case let .success(value):
-            equation.clear()
-            equation.insert(.number(ResultFormatter.string(from: value)))
-            isShowingResult = true
+            equation.showResult(ResultFormatter.string(from: value))
         case .failure(.divideByZero):
             errorMessage = "Can't divide by zero"
         case .failure(.overflow):
@@ -116,6 +110,13 @@ final class CalculatorViewModel {
         case .failure(.malformed):
             break // Incomplete entry: leave it for the user to finish.
         }
+    }
+
+    /// A manual edit never stops the mic. What was heard so far is committed first, so the edit
+    /// cannot be overwritten by a later revision and dictation carries on from the new cursor.
+    private func prepareForManualEdit() {
+        errorMessage = nil
+        commitDictation()
     }
 
     // MARK: - Mic
@@ -155,22 +156,59 @@ final class CalculatorViewModel {
     func stopListening() {
         guard isListening else { return }
         speech?.stop()
-        isListening = false
+        finishListening()
     }
 
     func dismissMicNotice() {
         micNotice = nil
     }
 
+    // MARK: - Dictation
+
     private func handle(_ event: SpeechEvent) {
         switch event {
         case let .transcript(text, isFinal):
-            // Dictation into the equation arrives in build step 7.
-            log.debug("transcript\(isFinal ? " (final)" : ""): \(text, privacy: .public)")
+            guard isListening else { return }
+            if dictation.update(transcript: text) {
+                errorMessage = nil
+                scheduleCommitAfterPause()
+            }
+            if isFinal {
+                commitDictation()
+            }
         case .segmentRestarted:
-            break
+            pauseTask?.cancel()
+            dictation.startNewSegment()
         case .stopped:
-            isListening = false
+            finishListening()
+        }
+    }
+
+    private func finishListening() {
+        pauseTask?.cancel()
+        dictation.startNewSegment()
+        isListening = false
+    }
+
+    private func commitDictation() {
+        pauseTask?.cancel()
+        dictation.commit()
+    }
+
+    private func scheduleCommitAfterPause() {
+        pauseTask?.cancel()
+        pauseTask = Task { [weak self, pauseBeforeCommit] in
+            try? await Task.sleep(for: pauseBeforeCommit)
+            guard !Task.isCancelled else { return }
+            self?.commitDictation()
+        }
+    }
+
+    private func run(_ command: VoiceCommand) {
+        switch command {
+        case .clear: equation.clear()
+        case .deleteLast: equation.deleteTokenBeforeCursor()
+        case .equals: evaluate()
         }
     }
 }

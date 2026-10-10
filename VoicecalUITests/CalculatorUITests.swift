@@ -72,6 +72,22 @@ final class CalculatorUITests: XCTestCase {
         XCTAssertTrue(app.buttons["Start listening"].waitForExistence(timeout: 2))
     }
 
+    func testDictationAppearsAsTokensAndMixesWithTyping() {
+        app.launchEnvironment["UITEST_SPEECH_SCRIPT"] = "twelve|twelve plus|twelve plus three"
+        app.launch()
+        tap("Start listening")
+        let last = app.buttons["Token 3 of 3, number 3"]
+        XCTAssertTrue(last.waitForExistence(timeout: 3))
+        XCTAssertEqual(last.value as? String, "pending")
+        snapshot("dictating")
+
+        tap("Multiply", "2")
+        XCTAssertTrue(app.buttons["Token 5 of 5, number 2"].exists)
+        XCTAssertTrue(app.buttons["Stop listening"].exists)
+        XCTAssertEqual(app.staticTexts["status"].label, "= 18")
+        snapshot("dictated-then-typed")
+    }
+
     /// Exercises the real recognizer. Opt in with TEST_RUNNER_REAL_MIC=1 after granting
     /// microphone and speech-recognition access to the app.
     func testRealMicSmoke() throws {

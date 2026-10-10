@@ -3,11 +3,12 @@ import SwiftUI
 struct TokenChipView: View {
     let token: Token
     let isEditing: Bool
+    var isPending = false
 
     var body: some View {
         Text(token.displayText)
             .font(DesignTokens.Typography.display)
-            .foregroundStyle(DesignTokens.Colors.textPrimary)
+            .foregroundStyle(isPending ? DesignTokens.Colors.textPending : DesignTokens.Colors.textPrimary)
             .lineLimit(1)
             .fixedSize()
             .frame(minHeight: DesignTokens.Size.minTapTarget)
@@ -32,6 +33,8 @@ struct TokenChipView: View {
         TokenChipView(token: .number("12"), isEditing: false)
         TokenChipView(token: .op(.add), isEditing: false)
         TokenChipView(token: .number("3.5"), isEditing: true)
+        TokenChipView(token: .op(.multiply), isEditing: false, isPending: true)
+        TokenChipView(token: .number("4"), isEditing: false, isPending: true)
     }
     .padding()
     .background(DesignTokens.Colors.surface)
