@@ -9,10 +9,12 @@ enum SpokenPhraseParser {
         parse(TranscriptLexer.lex(transcript), startsAfterOperand: startsAfterOperand)
     }
 
-    static func parse(_ rawLexemes: [Lexeme], startsAfterOperand: Bool = false) -> [ParsedItem] {
+    /// - Parameter start: where to begin. Earlier lexemes are not parsed, but still give
+    ///   mishear correction its context.
+    static func parse(_ rawLexemes: [Lexeme], from start: Int = 0, startsAfterOperand: Bool = false) -> [ParsedItem] {
         let lexemes = correctingMishears(rawLexemes)
         var items: [ParsedItem] = []
-        var index = 0
+        var index = max(start, 0)
 
         while index < lexemes.count {
             let afterOperand = endsInOperand(items, startsAfterOperand)

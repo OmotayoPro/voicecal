@@ -115,7 +115,7 @@ This section is the most important part of the spec. Implement and test it caref
 `SFSpeechRecognizer` streams **partial results that get revised** ("to" may become "two" then "twelve"). Never append tokens directly from partials. Use a `DictationSession`:
 
 - `anchorIndex`: the position in `equation.tokens` where this dictation segment begins.
-- `consumedTranscriptLength`: how many characters of the recognizer's cumulative transcript have already been committed.
+- `consumedTranscriptLength`: how much of the recognizer's cumulative transcript has already been committed. Implemented as a word count (`consumedCount`), since the recognizer reformats earlier text and shifts character offsets; see `ARCHITECTURE.md`.
 - `pendingTokens`: tokens produced from the *uncommitted* tail of the transcript. They are displayed live in the equation row in the `text/pending` color (committed tokens use `text/primary`), and **replaced wholesale on every new partial result**.
 
 On each partial result:

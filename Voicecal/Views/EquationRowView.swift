@@ -39,15 +39,17 @@ struct EquationRowView: View {
         HStack(spacing: 0) {
             ForEach(Array(equation.tokens.enumerated()), id: \.element.id) { index, token in
                 let isEditing = token.id == equation.editingTokenID
+                let isPending = equation.pendingTokenIDs.contains(token.id)
                 gap(at: index)
                 Button {
                     onTapToken(token.id)
                 } label: {
-                    TokenChipView(token: token, isEditing: isEditing)
+                    TokenChipView(token: token, isEditing: isEditing, isPending: isPending)
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(accessibilityLabel(for: token, at: index))
                 .accessibilityHint(isEditing ? "Double tap to stop editing" : "Double tap to edit")
+                .accessibilityValue(isPending ? "pending" : "")
                 .accessibilityAddTraits(isEditing ? .isSelected : [])
             }
             gap(at: equation.tokens.count)
