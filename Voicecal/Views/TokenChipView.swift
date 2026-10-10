@@ -7,7 +7,6 @@ struct TokenChipView: View {
 
     var body: some View {
         Text(token.displayText)
-            .font(DesignTokens.Typography.display)
             .foregroundStyle(isPending ? DesignTokens.Colors.textPending : DesignTokens.Colors.textPrimary)
             .lineLimit(1)
             .fixedSize()
@@ -36,6 +35,7 @@ struct TokenChipView: View {
         TokenChipView(token: .op(.multiply), isEditing: false, isPending: true)
         TokenChipView(token: .number("4"), isEditing: false, isPending: true)
     }
+    .font(.system(size: DesignTokens.Typography.displaySize))
     .padding()
     .background(DesignTokens.Colors.surface)
 }

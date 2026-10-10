@@ -40,6 +40,9 @@ struct CalculatorView: View {
         .padding(.bottom, DesignTokens.Spacing.screenBottom)
         .background(DesignTokens.Colors.surface.ignoresSafeArea())
         .sensoryFeedback(.impact(weight: .light), trigger: viewModel.isListening)
+        .sensoryFeedback(.error, trigger: viewModel.errorMessage) { _, message in
+            message != nil
+        }
         .onChange(of: scenePhase) { _, phase in
             if phase != .active {
                 viewModel.stopListening()
@@ -75,7 +78,8 @@ struct CalculatorView: View {
                     equation: viewModel.equation,
                     isListening: viewModel.isListening,
                     onTapToken: viewModel.tapToken,
-                    onTapGap: viewModel.tapGap
+                    onTapGap: viewModel.tapGap,
+                    onDeleteToken: viewModel.deleteToken
                 )
             }
         }

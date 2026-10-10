@@ -25,6 +25,7 @@ struct KeypadView: View {
                             }
                         }
                         .accessibilityLabel(key == .mic && isListening ? "Stop listening" : key.accessibilityLabel)
+                        .accessibilityValue(key == .mic && isListening ? "Listening" : "")
                     }
                 }
             }

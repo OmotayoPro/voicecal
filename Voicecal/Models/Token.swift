@@ -35,9 +35,22 @@ enum Token: Identifiable, Equatable {
         }
     }
 
-    /// `text` with a typographic minus on negative numbers.
+    /// `text` as shown on screen: digits grouped in threes and a typographic minus, e.g. "−1,234.5".
     var displayText: String {
-        text.hasPrefix("-") ? "−" + text.dropFirst() : text
+        guard case let .number(_, text) = self else { return text }
+        let isNegative = text.hasPrefix("-")
+        let parts = text.dropFirst(isNegative ? 1 : 0).split(
+            separator: ".", maxSplits: 1, omittingEmptySubsequences: false
+        )
+        var grouped = ""
+        for (offset, digit) in (parts.first ?? "").reversed().enumerated() {
+            if offset > 0, offset.isMultiple(of: 3) {
+                grouped.append(",")
+            }
+            grouped.append(digit)
+        }
+        let fraction = parts.count > 1 ? "." + parts[1] : ""
+        return (isNegative ? "−" : "") + String(grouped.reversed()) + fraction
     }
 
     var isNumber: Bool {

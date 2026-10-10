@@ -53,6 +53,21 @@ final class CalculatorUITests: XCTestCase {
         XCTAssertFalse(app.staticTexts["status"].exists)
     }
 
+    func testLongPressDeletesAToken() {
+        app.launch()
+        tap("1", "2", "Add", "3")
+        app.buttons["Token 2 of 3, operator plus"].press(forDuration: 0.9)
+        XCTAssertTrue(app.buttons["Token 2 of 2, number 3"].waitForExistence(timeout: 2))
+        XCTAssertFalse(app.buttons["Token 2 of 3, operator plus"].exists)
+    }
+
+    func testLargeNumbersAreGrouped() {
+        app.launch()
+        tap("1", "0", "0", "0", "Multiply", "1", "0", "0", "0")
+        XCTAssertEqual(app.staticTexts["status"].label, "= 1,000,000")
+        snapshot("grouped")
+    }
+
     func testClearReturnsToEmptyState() {
         app.launch()
         tap("5", "Add", "Clear all")

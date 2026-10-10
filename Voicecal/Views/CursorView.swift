@@ -3,6 +3,7 @@ import SwiftUI
 /// The blinking insertion marker. It glows while the mic is listening.
 struct CursorView: View {
     var isGlowing = false
+    var height = DesignTokens.Typography.displaySize * DesignTokens.Size.cursorHeightRatio
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var isDimmed = false
@@ -10,7 +11,7 @@ struct CursorView: View {
     var body: some View {
         Capsule()
             .fill(DesignTokens.Colors.textPrimary)
-            .frame(width: DesignTokens.Size.cursorWidth, height: DesignTokens.Size.cursorHeight)
+            .frame(width: DesignTokens.Size.cursorWidth, height: height)
             .shadow(
                 color: isGlowing ? DesignTokens.Colors.cursorGlowCool : .clear,
                 radius: DesignTokens.Size.cursorGlowRadius,

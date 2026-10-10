@@ -13,6 +13,22 @@ struct EquationTests {
         equation.tokens.map(\.text)
     }
 
+    // MARK: Display
+
+    @Test(arguments: [
+        ("7", "7"), ("999", "999"), ("1000", "1,000"), ("1000000", "1,000,000"), ("12.", "12."),
+        ("0.05", "0.05"), ("1234.5678", "1,234.5678"), ("-5", "−5"), ("-1234567.5", "−1,234,567.5"), ("0.", "0.")
+    ])
+    func numbersAreGroupedForDisplayOnly(text: String, expected: String) {
+        let token = Token.number(text)
+        #expect(token.displayText == expected)
+        #expect(token.text == text)
+    }
+
+    @Test func operatorsDisplayAsTheirSymbol() {
+        #expect(Token.op(.multiply).displayText == "×")
+    }
+
     // MARK: Insert
 
     @Test func insertAppendsAndAdvancesCursor() {
