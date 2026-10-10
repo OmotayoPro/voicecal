@@ -26,6 +26,6 @@ struct VoicecalApp: App {
                 )
             }
         #endif
-        return CalculatorViewModel(speech: SpeechRecognizerService())
+        return CalculatorViewModel(speech: SpeechRecognizerService(), speaker: ResultSpeaker())
     }
 }
