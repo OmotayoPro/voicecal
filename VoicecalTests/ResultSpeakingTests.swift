@@ -190,3 +190,51 @@ struct ResultSpeakingTests {
         #expect(speaker.spoken == ["four"])
     }
 }
+
+struct VoiceCatalogTests {
+    private let voices = [
+        VoiceOption(id: "b", name: "Samantha", region: "en-US", quality: .standard),
+        VoiceOption(id: "a", name: "Daniel", region: "en-GB", quality: .standard),
+        VoiceOption(id: "c", name: "Ava", region: "en-US", quality: .premium)
+    ]
+
+    @Test func groupsByQualityBestFirstAndSortsByName() {
+        let groups = VoiceCatalog.grouped(voices)
+        #expect(groups.map(\.quality) == [.premium, .standard])
+        #expect(groups[1].voices.map(\.name) == ["Daniel", "Samantha"])
+    }
+
+    @Test func labelIncludesRegion() {
+        #expect(voices[0].label == "Samantha (en-US)")
+    }
+
+    @Test func unknownLanguageFallsBackToEnglishVoices() {
+        let fallback = VoiceCatalog.systemVoices(languageCode: "zz")
+        #expect(fallback.allSatisfy { $0.region.hasPrefix("en") })
+    }
+}
+
+@MainActor
+struct VoiceSettingsWiringTests {
+    @Test func previewSpeaksEvenWhenAnswersAreNotSpoken() {
+        let speaker = FakeResultSpeaker()
+        let settings = VoiceSettings(defaults: makeScratchDefaults())
+        settings.speaksResult = false
+        let viewModel = CalculatorViewModel(speaker: speaker, settings: settings)
+        viewModel.previewVoice()
+        #expect(speaker.spoken.count == 1)
+        viewModel.stopPreview()
+        #expect(speaker.stopCount == 1)
+    }
+
+    @Test func chosenTimeoutDrivesTheAutoStop() async throws {
+        let speech = FakeSpeechRecognizer()
+        let settings = VoiceSettings(defaults: makeScratchDefaults())
+        settings.inactivityTimeout = .off
+        let viewModel = CalculatorViewModel(speech: speech, settings: settings)
+        await viewModel.startListening()
+        try await Task.sleep(for: .milliseconds(300))
+        #expect(viewModel.isListening)
+        #expect(viewModel.micCountdown == nil)
+    }
+}

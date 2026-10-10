@@ -2,6 +2,7 @@ import SwiftUI
 
 struct CalculatorView: View {
     @State private var viewModel: CalculatorViewModel
+    @State private var showsSettings = false
     @Environment(\.scenePhase) private var scenePhase
 
     @MainActor
@@ -11,9 +12,17 @@ struct CalculatorView: View {
 
     var body: some View {
         VStack(spacing: DesignTokens.Spacing.section) {
-            // Reserved for the settings button (build step 10).
-            Color.clear
-                .frame(height: DesignTokens.Size.toolbarButton)
+            HStack {
+                Button {
+                    viewModel.stopListening()
+                    showsSettings = true
+                } label: {
+                    Image(systemName: "gearshape")
+                }
+                .buttonStyle(KeyButtonStyle(kind: .tertiary, size: DesignTokens.Size.toolbarButton))
+                .accessibilityLabel("Voice settings")
+                Spacer()
+            }
 
             if let notice = viewModel.micNotice {
                 MicNoticeView(notice: notice, onDismiss: viewModel.dismissMicNotice)
@@ -37,6 +46,10 @@ struct CalculatorView: View {
             }
         }
         .onDisappear(perform: viewModel.stopListening)
+        .sheet(isPresented: $showsSettings, onDismiss: viewModel.stopPreview) {
+            VoiceSettingsView(settings: viewModel.settings, onPreview: viewModel.previewVoice)
+                .preferredColorScheme(.dark)
+        }
     }
 
     private var display: some View {
