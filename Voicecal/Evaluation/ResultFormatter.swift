@@ -1,9 +1,9 @@
 import Foundation
 
 enum ResultFormatter {
-    static let maxFractionDigits = 10
+    static let maxFractionDigits = 3
 
-    /// Plain digits with a "." separator, e.g. "45.5" or "-0.3333333333". Suitable as a number token's text.
+    /// Plain digits with a "." separator, e.g. "45.5" or "-0.333". Suitable as a number token's text.
     static func string(from value: Decimal) -> String {
         var rounded = Decimal()
         var input = value

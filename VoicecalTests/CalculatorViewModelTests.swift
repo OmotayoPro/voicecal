@@ -66,6 +66,18 @@ struct CalculatorViewModelTests {
         #expect(viewModel.statusText == nil)
     }
 
+    @Test func resultsAreRoundedToThreeDecimalPlaces() {
+        let viewModel = makeViewModel(typing: .digit(2), .divide, .digit(3))
+        #expect(viewModel.statusText == "= 0.667")
+        viewModel.handle(.equals)
+        #expect(texts(viewModel) == ["0.667"])
+    }
+
+    @Test func wholeResultsShowNoDecimalPlaces() {
+        let viewModel = makeViewModel(typing: .digit(1), .decimalPoint, .digit(5), .multiply, .digit(2), .equals)
+        #expect(texts(viewModel) == ["3"])
+    }
+
     @Test func operatorAfterEqualsContinuesFromTheResult() {
         let viewModel = makeViewModel(typing: .digit(6), .multiply, .digit(7), .equals, .subtract, .digit(2))
         #expect(texts(viewModel) == ["42", "−", "2"])
