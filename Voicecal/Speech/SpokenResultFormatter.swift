@@ -2,8 +2,8 @@ import Foundation
 
 /// Turns a result into words for the synthesizer: 45.5 -> "forty-five point five".
 enum SpokenResultFormatter {
-    /// Spoken precision only; the displayed result keeps its own.
-    static let maxFractionDigits = 4
+    /// The same precision the result is displayed with.
+    static let maxFractionDigits = ResultFormatter.maxFractionDigits
     /// Beyond this, words become unlistenable, so the digits are handed to the synthesizer as they are.
     private static let largestSpelledOut = Decimal(sign: .plus, exponent: 15, significand: 1)
 

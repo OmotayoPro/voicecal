@@ -175,6 +175,7 @@ Number-word parsing is its own unit (`SpokenNumberParser`) so it can be tested i
 
 - Write a small recursive-descent or shunting-yard evaluator over `[Token]`. **Do not use `NSExpression`** (it throws Objective-C exceptions on malformed input).
 - Use `Decimal`, not `Double`, to avoid `0.1 + 0.2` artifacts.
+- Results are rounded to at most 3 decimal places, both on screen and when spoken. Trailing zeros are dropped (`3`, not `3.000`).
 - Standard precedence: `× ÷` before `+ −`. `%` applies to the preceding number (`50 %` = 0.5).
 - Return `Result<Decimal, EvaluationError>` with cases: `.divideByZero`, `.malformed`, `.overflow`.
 - Live result updates after every equation change. Show `—` or hide when the expression is incomplete. Never flash an error mid-entry.
