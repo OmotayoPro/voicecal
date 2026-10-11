@@ -79,13 +79,20 @@ final class CalculatorUITests: XCTestCase {
         app.launch()
         tap("Start listening")
         XCTAssertTrue(app.buttons["Stop listening"].waitForExistence(timeout: 2))
+        usleep(150_000)
+        snapshot("mic-fading-in")
+        sleep(1)
         snapshot("mic-on")
+        sleep(2)
+        snapshot("mic-on-later")
 
         tap("5", "Add")
         XCTAssertTrue(app.buttons["Stop listening"].exists)
 
         tap("Stop listening")
         XCTAssertTrue(app.buttons["Start listening"].waitForExistence(timeout: 2))
+        sleep(1)
+        snapshot("mic-off")
     }
 
     func testDictationAppearsAsTokensAndMixesWithTyping() {

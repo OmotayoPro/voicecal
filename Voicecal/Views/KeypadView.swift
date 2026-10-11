@@ -18,7 +18,7 @@ struct KeypadView: View {
                         } label: {
                             key.label
                         }
-                        .buttonStyle(KeyButtonStyle(kind: key.kind, isGlowing: key == .mic && isListening))
+                        .buttonStyle(KeyButtonStyle(kind: key.kind, glow: key == .mic ? isListening : nil))
                         .overlay {
                             if key == .mic, let micCountdown {
                                 CountdownRing(remaining: micCountdown)

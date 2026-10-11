@@ -73,6 +73,7 @@ enum DesignTokens {
         static let spreadScale: CGFloat = 1.5
         static let spreadBlur: CGFloat = 10
         static let spreadOpacity: Double = 0.3
+        static let fadeDuration: Double = 0.6
     }
 
     enum Typography {
