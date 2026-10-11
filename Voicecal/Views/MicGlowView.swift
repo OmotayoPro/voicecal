@@ -1,24 +1,36 @@
 import SwiftUI
 
-/// The glowing fill of the mic key while listening (Figma `audio-input`, state Hover).
-/// Five blurred blobs added together over the key's base fill. Place it inside a circle clip.
+/// The glowing orb inside the mic key (Figma `audio-input`, state Hover): five blurred blobs
+/// added together over the key's base fill. It fades in and out with `isActive`, and while
+/// active each blob keeps turning about its own centre. Place it inside a circle clip.
 struct MicGlowView: View {
+    let isActive: Bool
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     var body: some View {
-        ZStack {
-            blobLayer
-            // Figma tops the blobs with a glass ellipse that refracts their light out to the rim.
-            // Glass effects need iOS 26, so a wider, softer copy of the blobs stands in for it.
-            blobLayer
-                .scaleEffect(DesignTokens.MicGlow.spreadScale)
-                .blur(radius: DesignTokens.MicGlow.spreadBlur)
-                .opacity(DesignTokens.MicGlow.spreadOpacity)
-                .blendMode(.plusLighter)
+        TimelineView(.animation(paused: !isActive || reduceMotion)) { context in
+            let time = reduceMotion ? 0 : context.date.timeIntervalSinceReferenceDate
+            ZStack {
+                blobLayer(at: time)
+                // Figma tops the blobs with a glass ellipse that refracts their light out to the rim.
+                // Glass effects need iOS 26, so a wider, softer copy of the blobs stands in for it.
+                blobLayer(at: time)
+                    .scaleEffect(DesignTokens.MicGlow.spreadScale)
+                    .blur(radius: DesignTokens.MicGlow.spreadBlur)
+                    .opacity(DesignTokens.MicGlow.spreadOpacity)
+                    .blendMode(.plusLighter)
+            }
         }
         .frame(width: DesignTokens.Size.key, height: DesignTokens.Size.key)
+        // Faded as one layer, then added onto the key, so the transition stays soft.
+        .opacity(isActive ? 1 : 0)
+        .blendMode(.plusLighter)
+        .animation(.easeInOut(duration: DesignTokens.MicGlow.fadeDuration), value: isActive)
         .accessibilityHidden(true)
     }
 
-    private var blobLayer: some View {
+    private func blobLayer(at time: TimeInterval) -> some View {
         ZStack {
             ForEach(Self.blobs.indices, id: \.self) { index in
                 let blob = Self.blobs[index]
@@ -26,7 +38,7 @@ struct MicGlowView: View {
                     .fill(blob.color)
                     .frame(width: blob.size.width, height: blob.size.height)
                     .blur(radius: DesignTokens.MicGlow.blur)
-                    .rotationEffect(.degrees(blob.rotation))
+                    .rotationEffect(.degrees(blob.rotation + time * 360 / blob.secondsPerTurn))
                     .position(blob.center)
                     .blendMode(.plusLighter)
             }
@@ -38,7 +50,10 @@ struct MicGlowView: View {
         let path: String
         let size: CGSize
         let center: CGPoint
+        /// Resting angle from Figma, in degrees.
         let rotation: Double
+        /// Time for one full turn. Negative turns anticlockwise. Each blob differs, so the orb never repeats visibly.
+        let secondsPerTurn: Double
         let color: Color
     }
 
@@ -46,23 +61,28 @@ struct MicGlowView: View {
     private static let blobs: [Blob] = [
         Blob(
             path: flame, size: CGSize(width: 83, height: 80),
-            center: CGPoint(x: 25.51, y: 41.59), rotation: -16.98, color: DesignTokens.MicGlow.light
+            center: CGPoint(x: 25.51, y: 41.59),
+            rotation: -16.98, secondsPerTurn: 14, color: DesignTokens.MicGlow.light
         ),
         Blob(
             path: flame, size: CGSize(width: 83, height: 80),
-            center: CGPoint(x: 53.71, y: 27.99), rotation: -65.79, color: DesignTokens.MicGlow.light
+            center: CGPoint(x: 53.71, y: 27.99),
+            rotation: -65.79, secondsPerTurn: -18, color: DesignTokens.MicGlow.light
         ),
         Blob(
             path: wideFlame, size: CGSize(width: 84, height: 80),
-            center: CGPoint(x: 47.29, y: 49.58), rotation: -16.98, color: DesignTokens.MicGlow.deep
+            center: CGPoint(x: 47.29, y: 49.58),
+            rotation: -16.98, secondsPerTurn: 22, color: DesignTokens.MicGlow.deep
         ),
         Blob(
             path: smallFlame, size: CGSize(width: 73.4334, height: 71.6353),
-            center: CGPoint(x: 42.95, y: 44.47), rotation: 58.02, color: DesignTokens.MicGlow.core
+            center: CGPoint(x: 42.95, y: 44.47),
+            rotation: 58.02, secondsPerTurn: -11, color: DesignTokens.MicGlow.core
         ),
         Blob(
             path: tallFlame, size: CGSize(width: 60.4672, height: 100.253),
-            center: CGPoint(x: 31.82, y: 22.55), rotation: 74.16, color: DesignTokens.MicGlow.core
+            center: CGPoint(x: 31.82, y: 22.55),
+            rotation: 74.16, secondsPerTurn: 16, color: DesignTokens.MicGlow.core
         )
     ]
 
@@ -144,7 +164,7 @@ private struct SVGPath: Shape {
 }
 
 #Preview {
-    MicGlowView()
+    MicGlowView(isActive: true)
         .background(DesignTokens.Colors.secondaryDefault)
         .clipShape(Circle())
         .padding()
