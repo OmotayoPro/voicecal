@@ -32,7 +32,7 @@ struct SpokenNumberParserTests {
         ("one point twenty five", "1.25"),
         ("one hundred point one", "100.1"),
         ("one two three", "123"),
-        ("zero five", "5"),
+        ("zero five", "05"),
         ("nine nine point nine", "99.9"),
         ("three dot five", "3.5"),
         ("dot five", "0.5"),
@@ -48,6 +48,20 @@ struct SpokenNumberParserTests {
         ("tri", "3"),
         ("twenty tree", "23"),
         ("sex hundred and ate", "608"),
+        ("one five zero zero zero zero zero", "1500000"),
+        ("1 5 0 0 0 0 0", "1500000"),
+        ("15 0 0 0 0 0", "1500000"),
+        ("150 000", "150000"),
+        ("one 5 oh oh", "1500"),
+        ("1 five", "15"),
+        ("double five", "55"),
+        ("one double zero", "100"),
+        ("triple seven", "777"),
+        ("nine double 0 five", "9005"),
+        ("1 5 point 2 5", "15.25"),
+        ("one five dot two", "15.2"),
+        ("0 0 7", "007"),
+        ("zero zero", "00"),
         ("12", "12"),
         ("3.5", "3.5"),
         (".5", "0.5"),
@@ -64,7 +78,7 @@ struct SpokenNumberParserTests {
 
     @Test(arguments: [
         "", "hundred", "and", "point", "dot", "plus", "banana", "twenty thirty", "five twenty",
-        "one hundred and", "thousand", "twelve five", "a"
+        "one hundred and", "thousand", "twelve five", "a", "double", "triple plus", "1 5 3.5"
     ])
     func rejectsWhatIsNotExactlyOneNumber(phrase: String) {
         #expect(SpokenNumberParser.number(from: phrase) == nil)

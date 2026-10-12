@@ -55,6 +55,10 @@ struct SpokenPhraseParserTests {
         ("two hundred times ten percent", "200 × 10 %"),
         ("one hundred and five plus two thousand three hundred", "105 + 2300"),
         ("Twelve, plus fifteen.", "12 + 15"),
+        ("one five zero plus two five", "150 + 25"),
+        ("1 5 0 + 2 5", "150 + 25"),
+        ("1 5 0 times 3", "150 × 3"),
+        ("nine nine divided by one one", "99 ÷ 11"),
         ("twelve fifteen", "12 15")
     ])
     func parsesEquations(transcript: String, expected: String) {

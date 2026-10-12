@@ -7,14 +7,17 @@ enum SpokenNumberParser {
         var index = start
         var integer: String?
 
-        if case let .literal(text)? = lexeme(lexemes, index) {
+        if let (text, used) = digitRun(lexemes, index) {
+            integer = text
+            index += used
+        } else if case let .literal(text)? = lexeme(lexemes, index) {
             if text.contains(".") {
                 return (text, 1)
             }
             let (value, used) = scaledLiteral(text, lexemes, index)
             integer = value
             index += used
-        } else if let (text, used) = digitRun(lexemes, index) ?? cardinal(lexemes, index) {
+        } else if let (text, used) = cardinal(lexemes, index) {
             integer = text
             index += used
         }
@@ -61,15 +64,41 @@ enum SpokenNumberParser {
         return (String(value), used)
     }
 
-    /// "one two three" -> "123". Needs at least two single digits in a row.
+    /// A number read out digit by digit: "one five zero zero" -> "1500".
+    ///
+    /// The recognizer may write any part of it as digits ("1 5 0 0", "15 0 0", "150 000"), so a run
+    /// is any mix of single-digit words and digit groups, at least two of them, joined in order.
+    /// "double" and "triple" repeat the digit that follows.
     private static func digitRun(_ lexemes: [Lexeme], _ index: Int) -> (String, Int)? {
         var digits = ""
-        while let next = word(lexemes, index + digits.count), let value = SpokenVocabulary.units[next] {
-            digits += String(value)
+        var used = 0
+        var pieces = 0
+        while let next = lexeme(lexemes, index + used) {
+            if let piece = digitPiece(next) {
+                digits += piece
+                used += 1
+            } else if case let .word(text) = next, let times = SpokenVocabulary.repeats[text],
+                      let piece = lexeme(lexemes, index + used + 1).flatMap(digitPiece) {
+                digits += String(repeating: piece, count: times)
+                used += 2
+                pieces += 1
+            } else {
+                break
+            }
+            pieces += 1
         }
-        guard digits.count > 1 else { return nil }
-        let trimmed = String(digits.drop { $0 == "0" })
-        return (trimmed.isEmpty ? "0" : trimmed, digits.count)
+        // Leading zeros are kept ("0 0 7" is "007"): if these digits carry on a number that is
+        // already there, they count. `Equation` drops them when the number stands alone.
+        return pieces > 1 ? (digits, used) : nil
+    }
+
+    /// The digits a lexeme contributes to a digit-by-digit number, if it can be part of one.
+    private static func digitPiece(_ lexeme: Lexeme) -> String? {
+        switch lexeme {
+        case let .word(text): SpokenVocabulary.units[text].map(String.init)
+        case let .literal(text): text.contains(".") ? nil : text
+        case .symbol: nil
+        }
     }
 
     /// "two thousand three hundred and five" -> "2305".

@@ -15,6 +15,9 @@ final class Equation {
     /// True right after equals, while the equation is only the result. The next number
     /// starts a new equation; an operator continues from the result.
     private(set) var isShowingResult = false
+    /// A committed number that pending speech is currently extending, as it was before, so a
+    /// revised transcript can take those digits back.
+    private var extendedNumber: (id: UUID, text: String)?
 
     /// The value so far, ignoring a trailing operator. Nil until there is something to calculate.
     var liveResult: Decimal? {
@@ -91,6 +94,7 @@ final class Equation {
     }
 
     func clear() {
+        extendedNumber = nil
         tokens.removeAll()
         cursorIndex = 0
         editingTokenID = nil
@@ -123,8 +127,15 @@ final class Equation {
     func setPending(_ newTokens: [Token]) {
         removePending()
         var ids: Set<UUID> = []
-        for token in newTokens {
-            insert(token)
+        var remaining = newTokens[...]
+        if let first = remaining.first, let extended = extending(with: first) {
+            // Digits spoken after a pause carry on the number already there.
+            extendedNumber = (extended.id, tokens[extended.index].text)
+            tokens[extended.index] = .number(id: extended.id, text: extended.text)
+            remaining = remaining.dropFirst()
+        }
+        for token in remaining {
+            insert(Self.withoutLeadingZeros(token))
             // `insert` may have replaced an edited token in place, which keeps that token's id.
             ids.insert(tokens[cursorIndex - 1].id)
         }
@@ -134,9 +145,55 @@ final class Equation {
     /// Makes the in-flight dictation tokens permanent.
     func commitPending() {
         pendingTokenIDs.removeAll()
+        extendedNumber = nil
+    }
+
+    /// Inserts a spoken token for good. A number spoken straight after another number, with no
+    /// operator between, carries that number on ("15" then "0" is 150) instead of sitting beside it,
+    /// which is how a figure read out digit by digit arrives when the speaker pauses.
+    func insertSpoken(_ token: Token) {
+        if let extended = extending(with: token) {
+            tokens[extended.index] = .number(id: extended.id, text: extended.text)
+        } else {
+            insert(Self.withoutLeadingZeros(token))
+        }
+    }
+
+    private struct NumberExtension {
+        let index: Int
+        let id: UUID
+        let text: String
+    }
+
+    /// The number before the cursor with `token`'s digits added, if `token` can extend it.
+    private func extending(with token: Token) -> NumberExtension? {
+        guard editingTokenID == nil, !isShowingResult,
+              case let .number(_, spoken) = token, spoken.allSatisfy(\.isASCIIDigit),
+              let (id, text) = numberBeforeCursor, !pendingTokenIDs.contains(id)
+        else { return nil }
+        return NumberExtension(index: cursorIndex - 1, id: id, text: Self.withoutLeadingZeros(text + spoken))
+    }
+
+    /// "007" is 7 and "00.5" is 0.5. Digits after the decimal point are left alone.
+    private static func withoutLeadingZeros(_ text: String) -> String {
+        let sign = text.hasPrefix("-") ? "-" : ""
+        let unsigned = text.dropFirst(sign.count)
+        let whole = unsigned.prefix { $0 != "." }
+        let rest = unsigned.dropFirst(whole.count)
+        let trimmed = whole.drop { $0 == "0" }
+        return sign + (trimmed.isEmpty && !whole.isEmpty ? "0" : String(trimmed)) + rest
+    }
+
+    private static func withoutLeadingZeros(_ token: Token) -> Token {
+        guard case let .number(id, text) = token else { return token }
+        return .number(id: id, text: withoutLeadingZeros(text))
     }
 
     private func removePending() {
+        if let original = extendedNumber, let index = index(of: original.id) {
+            tokens[index] = .number(id: original.id, text: original.text)
+        }
+        extendedNumber = nil
         guard !pendingTokenIDs.isEmpty else { return }
         let removedBeforeCursor = tokens[..<cursorIndex].filter { pendingTokenIDs.contains($0.id) }.count
         tokens.removeAll { pendingTokenIDs.contains($0.id) }
