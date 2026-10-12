@@ -38,5 +38,6 @@ UI tests run without a microphone by launching the app with a scripted recognize
 ## Docs
 
 - `VOICE_CALCULATOR_SPEC.md`: the behaviour spec and build plan.
+- `docs/TESTFLIGHT.md`: what is left to do to put a build on TestFlight.
 - `ARCHITECTURE.md`: how dictation is committed and why manual edits never interrupt it.
 - `docs/screenshots`: one or more screenshots per build step.

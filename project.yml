@@ -26,6 +26,9 @@ targets:
         INFOPLIST_KEY_CFBundleDisplayName: Voicecal
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
+        # The app uses no encryption of its own, so App Store Connect need not ask per build.
+        INFOPLIST_KEY_ITSAppUsesNonExemptEncryption: NO
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.utilities
         INFOPLIST_KEY_NSMicrophoneUsageDescription: "Used so you can dictate calculations by voice."
         INFOPLIST_KEY_NSSpeechRecognitionUsageDescription: "Used to turn your spoken numbers and operators into an equation."
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
