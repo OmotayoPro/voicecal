@@ -21,6 +21,8 @@ xcodegen generate
 open Voicecal.xcodeproj
 ```
 
+The mic orb uses a Metal shader. If the build says the Metal Toolchain is missing, run `xcodebuild -downloadComponent MetalToolchain` once.
+
 Requires Xcode 16 or later. The app targets iOS 17+. Use a real device for anything involving the microphone; the simulator's audio input is unreliable.
 
 ## Checks

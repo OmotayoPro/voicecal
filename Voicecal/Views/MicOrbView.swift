@@ -3,14 +3,17 @@ import SwiftUI
 /// The orb inside the mic key while listening. It mirrors the Figma component
 /// `button / Type=audio-input`, layer for layer, bottom to top:
 ///
-///     blob 5, blob 4, blob 3, blob 2, blob 1   blurred vectors, added together (linear dodge)
-///     glass                                    an ellipse with Figma's glass effect
-///     icon                                     drawn by the key itself
+///     blob 3, blob 2, blob 1   blurred vectors, added together (linear dodge)
+///     glass                    an ellipse with Figma's glass effect
+///     icon                     drawn by the key itself
 ///
-/// In Figma the idle variant holds the same layers, hidden, with the five blobs turned as one
-/// group; tapping smart-animates between the variants. `OrbMotion` reproduces that sweep. After
-/// it, each blob keeps circling and turning at its own pace for as long as the mic is on, which
-/// is the feedback that the mic is live. Place this inside a circle clip.
+/// In Figma the idle variant holds the same layers, hidden, with the blobs turned as one group;
+/// tapping smart-animates between the variants. `OrbMotion` reproduces that sweep. After it,
+/// each blob keeps circling and turning at its own pace for as long as the mic is on, which is
+/// the feedback that the mic is live.
+///
+/// The view draws the key's own fill beneath the blobs, because the glass has to bend the
+/// finished picture, fill included. Place it over the key's surface, inside a circle clip.
 struct MicOrbView: View {
     let isActive: Bool
 
@@ -23,13 +26,14 @@ struct MicOrbView: View {
         TimelineView(.animation(paused: !isActive && !isSettling)) { context in
             let pose = motion.pose(at: context.date, reduceMotion: reduceMotion)
             ZStack {
+                keyFill
                 blobs(at: pose.drift)
                     .rotationEffect(.degrees(pose.angle), anchor: DesignTokens.MicOrb.pivot)
-                    .opacity(pose.opacity)
                     .blendMode(.plusLighter)
-                glass(over: pose)
-                    .opacity(pose.opacity)
             }
+            .frame(width: DesignTokens.Size.key, height: DesignTokens.Size.key)
+            .layerEffect(glass, maxSampleOffset: DesignTokens.MicOrb.glassMaxBend)
+            .opacity(pose.opacity)
         }
         .frame(width: DesignTokens.Size.key, height: DesignTokens.Size.key)
         .accessibilityHidden(true)
@@ -39,7 +43,19 @@ struct MicOrbView: View {
         }
     }
 
-    /// Figma layers `blob 5` to `blob 1`, in layer order, each where its own motion has taken it.
+    /// The same fill and gloss as the idle mic key.
+    private var keyFill: some View {
+        ZStack {
+            DesignTokens.Colors.secondaryDefault
+            LinearGradient(
+                colors: [DesignTokens.Colors.highlight.opacity(DesignTokens.Opacity.keyGloss), .clear],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+        }
+    }
+
+    /// Figma layers `blob 3` to `blob 1`, in layer order, each where its own motion has taken it.
     private func blobs(at drift: TimeInterval) -> some View {
         ZStack {
             ForEach(OrbBlob.allCases, id: \.self) { blob in
@@ -56,23 +72,19 @@ struct MicOrbView: View {
         .frame(width: DesignTokens.Size.key, height: DesignTokens.Size.key)
     }
 
-    /// Figma layer `glass`: a clear ellipse whose glass effect refracts the blobs beneath it,
-    /// carrying their colour out to the rim so the whole key turns gold.
-    ///
-    /// Figma's glass cannot be reproduced exactly. The system glass effect (iOS 26) was tried and
-    /// washes the orb out, so the same result is built by hand on every iOS version: a warm tint
-    /// over the whole key, plus a wider, softer copy of the blobs that follows them around.
-    private func glass(over pose: OrbMotion.Pose) -> some View {
-        ZStack {
-            Circle()
-                .fill(DesignTokens.MicOrb.blobCore.opacity(DesignTokens.MicOrb.glassTint))
-            blobs(at: pose.drift)
-                .rotationEffect(.degrees(pose.angle), anchor: DesignTokens.MicOrb.pivot)
-                .scaleEffect(DesignTokens.MicOrb.glassSpreadScale)
-                .blur(radius: DesignTokens.MicOrb.glassSpreadBlur)
-                .opacity(DesignTokens.MicOrb.glassSpreadOpacity)
-                .blendMode(.plusLighter)
-        }
+    /// Figma layer `glass`, as a Metal shader (`Shaders/OrbGlass.metal`) taking Figma's own
+    /// glass settings. It bends the blobs' light out to the rim and adds the rim highlights.
+    private var glass: Shader {
+        let light = DesignTokens.MicOrb.glassLightAngle * .pi / 180
+        return ShaderLibrary.orbGlass(
+            .float2(DesignTokens.Size.key, DesignTokens.Size.key),
+            .float(DesignTokens.MicOrb.glassRefraction),
+            .float(DesignTokens.MicOrb.glassDepth),
+            .float(DesignTokens.MicOrb.glassDispersion),
+            // Figma measures the angle from straight up, so -45° is the top left.
+            .float2(sin(light), -cos(light)),
+            .float(DesignTokens.MicOrb.glassLightIntensity)
+        )
     }
 
     private func settle() {
@@ -90,20 +102,16 @@ struct MicOrbView: View {
     }
 }
 
-/// The five blurred vectors of the orb. Case names, order, geometry and colors match the
+/// The blurred vectors of the orb. Case names, order, geometry and colors match the
 /// Figma layers of `Type=audio-input, State=Hover` (node 711:299).
 enum OrbBlob: CaseIterable {
     // Bottom to top, as in the Figma layer list.
-    case blob5
-    case blob4
     case blob3
     case blob2
     case blob1
 
     var figmaName: String {
         switch self {
-        case .blob5: "blob 5"
-        case .blob4: "blob 4"
         case .blob3: "blob 3"
         case .blob2: "blob 2"
         case .blob1: "blob 1"
@@ -112,8 +120,6 @@ enum OrbBlob: CaseIterable {
 
     var figmaNodeID: String {
         switch self {
-        case .blob5: "711:282"
-        case .blob4: "711:286"
         case .blob3: "711:285"
         case .blob2: "711:283"
         case .blob1: "711:284"
@@ -123,8 +129,6 @@ enum OrbBlob: CaseIterable {
     /// Centre of the layer inside the 84 pt key, in the listening pose.
     var center: CGPoint {
         switch self {
-        case .blob5: CGPoint(x: 25.51, y: 41.59)
-        case .blob4: CGPoint(x: 53.71, y: 27.99)
         case .blob3: CGPoint(x: 47.29, y: 49.58)
         case .blob2: CGPoint(x: 42.95, y: 44.47)
         case .blob1: CGPoint(x: 31.82, y: 22.55)
@@ -134,8 +138,6 @@ enum OrbBlob: CaseIterable {
     /// Clockwise degrees in the listening pose (Figma reports the same angles anticlockwise).
     var rotation: Double {
         switch self {
-        case .blob5: -16.98
-        case .blob4: -65.79
         case .blob3: -16.98
         case .blob2: 58.02
         case .blob1: 74.16
@@ -144,7 +146,6 @@ enum OrbBlob: CaseIterable {
 
     var color: Color {
         switch self {
-        case .blob5, .blob4: DesignTokens.MicOrb.blobLight
         case .blob3: DesignTokens.MicOrb.blobDeep
         case .blob2, .blob1: DesignTokens.MicOrb.blobCore
         }
@@ -157,8 +158,6 @@ enum OrbBlob: CaseIterable {
     /// its own rate, so the light keeps shifting and never visibly repeats.
     private var motion: BlobMotion {
         switch self {
-        case .blob5: BlobMotion(orbit: 7, breath: 4.3, reach: 0.25, spin: 10)
-        case .blob4: BlobMotion(orbit: 9, breath: 3.1, reach: 0.2, spin: -13)
         case .blob3: BlobMotion(orbit: 12, breath: 5.2, reach: 0.3, spin: 16)
         case .blob2: BlobMotion(orbit: 5.5, breath: 3.7, reach: 0.6, spin: -8)
         case .blob1: BlobMotion(orbit: 8, breath: 4.9, reach: 0.2, spin: 11)
@@ -199,7 +198,6 @@ enum OrbBlob: CaseIterable {
     /// Size of the exported artwork: the vector plus 20 pt of room on every side for its blur.
     var size: CGSize {
         switch self {
-        case .blob5, .blob4: CGSize(width: 83, height: 80)
         case .blob3: CGSize(width: 84, height: 80)
         case .blob2: CGSize(width: 73.4334, height: 71.6353)
         case .blob1: CGSize(width: 60.4672, height: 100.253)
@@ -209,19 +207,12 @@ enum OrbBlob: CaseIterable {
     /// Path data as exported from Figma.
     var path: String {
         switch self {
-        case .blob5, .blob4: Self.roundFlame
         case .blob3: Self.wideFlame
         case .blob2: Self.smallFlame
         case .blob1: Self.tallFlame
         }
     }
 
-    static let roundFlame = """
-    M36.2888 21.1371C31.1824 17.0582 23.7888 24.9283 20.7303 29.3732C18.7356 33.2952 20.7303 35.2562 27.9111 \
-    31.7264C35.092 34.0796 23.9218 41.1391 25.5175 52.9051C27.1133 64.671 40.6771 58.788 55.4378 56.4349C70.1984 \
-    54.0817 60.624 50.5519 49.8527 45.4533C39.0814 40.3547 43.4697 39.9625 44.2676 33.6874C45.0654 27.4122 \
-    42.6718 26.2356 36.2888 21.1371Z
-    """
     static let wideFlame = """
     M36.6676 21.1371C31.4425 17.0582 23.8769 24.9283 20.7473 29.3732C18.7062 33.2952 20.7473 35.2562 28.0951 \
     31.7264C35.443 34.0796 24.013 41.1391 25.6458 52.9051C27.2787 64.671 41.158 58.788 56.2619 56.4349C71.3658 \
