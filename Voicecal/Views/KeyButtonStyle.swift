@@ -44,7 +44,7 @@ private struct KeySurface: View {
                 )
             }
             if let glow {
-                MicGlowView(isActive: glow)
+                MicOrbView(isActive: glow)
             }
             edgeHighlight(offset: highlightWidth, opacity: topHighlightOpacity)
             edgeHighlight(offset: -highlightWidth, opacity: bottomHighlightOpacity)
