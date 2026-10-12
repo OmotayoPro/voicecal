@@ -78,11 +78,15 @@ enum DesignTokens {
         /// Figma variants: it is the one point that maps every idle blob onto its listening position.
         static let pivot = UnitPoint(x: 39.6 / 84, y: 37.7 / 84)
 
-        // The hand-built glass layer.
-        static let glassTint: Double = 0.38
-        static let glassSpreadScale: CGFloat = 1.5
-        static let glassSpreadBlur: CGFloat = 10
-        static let glassSpreadOpacity: Double = 0.3
+        // The `glass` layer's effect settings, as set in Figma.
+        static let glassRefraction: Float = 1
+        static let glassDepth: Float = 24
+        static let glassDispersion: Float = 1
+        /// Degrees from straight up; negative is towards the left.
+        static let glassLightAngle: Double = -45
+        static let glassLightIntensity: Float = 0.8
+        /// The furthest the shader samples from a pixel: depth times the largest dispersion factor.
+        static let glassMaxBend = CGSize(width: 32, height: 32)
     }
 
     enum Typography {

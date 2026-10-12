@@ -7,10 +7,13 @@ import SwiftUI
 ///     glass                                    an ellipse with Figma's glass effect
 ///     icon                                     drawn by the key itself
 ///
-/// In Figma the idle variant holds the same layers, hidden, with the five blobs turned as one
-/// group; tapping smart-animates between the variants. `OrbMotion` reproduces that sweep. After
-/// it, each blob keeps circling and turning at its own pace for as long as the mic is on, which
-/// is the feedback that the mic is live. Place this inside a circle clip.
+/// In Figma the idle variant holds the same layers, hidden, with the blobs turned as one group;
+/// tapping smart-animates between the variants. `OrbMotion` reproduces that sweep. After it,
+/// each blob keeps circling and turning at its own pace for as long as the mic is on, which is
+/// the feedback that the mic is live.
+///
+/// The view draws the key's own fill beneath the blobs, because the glass has to bend the
+/// finished picture, fill included. Place it over the key's surface, inside a circle clip.
 struct MicOrbView: View {
     let isActive: Bool
 
@@ -23,19 +26,32 @@ struct MicOrbView: View {
         TimelineView(.animation(paused: !isActive && !isSettling)) { context in
             let pose = motion.pose(at: context.date, reduceMotion: reduceMotion)
             ZStack {
+                keyFill
                 blobs(at: pose.drift)
                     .rotationEffect(.degrees(pose.angle), anchor: DesignTokens.MicOrb.pivot)
-                    .opacity(pose.opacity)
                     .blendMode(.plusLighter)
-                glass(over: pose)
-                    .opacity(pose.opacity)
             }
+            .frame(width: DesignTokens.Size.key, height: DesignTokens.Size.key)
+            .layerEffect(glass, maxSampleOffset: DesignTokens.MicOrb.glassMaxBend)
+            .opacity(pose.opacity)
         }
         .frame(width: DesignTokens.Size.key, height: DesignTokens.Size.key)
         .accessibilityHidden(true)
         .onChange(of: isActive, initial: true) { _, isActive in
             motion.setActive(isActive, at: .now)
             settle()
+        }
+    }
+
+    /// The same fill and gloss as the idle mic key.
+    private var keyFill: some View {
+        ZStack {
+            DesignTokens.Colors.secondaryDefault
+            LinearGradient(
+                colors: [DesignTokens.Colors.highlight.opacity(DesignTokens.Opacity.keyGloss), .clear],
+                startPoint: .top,
+                endPoint: .bottom
+            )
         }
     }
 
@@ -56,23 +72,19 @@ struct MicOrbView: View {
         .frame(width: DesignTokens.Size.key, height: DesignTokens.Size.key)
     }
 
-    /// Figma layer `glass`: a clear ellipse whose glass effect refracts the blobs beneath it,
-    /// carrying their colour out to the rim so the whole key turns gold.
-    ///
-    /// Figma's glass cannot be reproduced exactly. The system glass effect (iOS 26) was tried and
-    /// washes the orb out, so the same result is built by hand on every iOS version: a warm tint
-    /// over the whole key, plus a wider, softer copy of the blobs that follows them around.
-    private func glass(over pose: OrbMotion.Pose) -> some View {
-        ZStack {
-            Circle()
-                .fill(DesignTokens.MicOrb.blobCore.opacity(DesignTokens.MicOrb.glassTint))
-            blobs(at: pose.drift)
-                .rotationEffect(.degrees(pose.angle), anchor: DesignTokens.MicOrb.pivot)
-                .scaleEffect(DesignTokens.MicOrb.glassSpreadScale)
-                .blur(radius: DesignTokens.MicOrb.glassSpreadBlur)
-                .opacity(DesignTokens.MicOrb.glassSpreadOpacity)
-                .blendMode(.plusLighter)
-        }
+    /// Figma layer `glass`, as a Metal shader (`Shaders/OrbGlass.metal`) taking Figma's own
+    /// glass settings. It bends the blobs' light out to the rim and adds the rim highlights.
+    private var glass: Shader {
+        let light = DesignTokens.MicOrb.glassLightAngle * .pi / 180
+        return ShaderLibrary.orbGlass(
+            .float2(DesignTokens.Size.key, DesignTokens.Size.key),
+            .float(DesignTokens.MicOrb.glassRefraction),
+            .float(DesignTokens.MicOrb.glassDepth),
+            .float(DesignTokens.MicOrb.glassDispersion),
+            // Figma measures the angle from straight up, so -45° is the top left.
+            .float2(sin(light), -cos(light)),
+            .float(DesignTokens.MicOrb.glassLightIntensity)
+        )
     }
 
     private func settle() {
