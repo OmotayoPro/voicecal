@@ -6,12 +6,14 @@ import Testing
 /// `button / Type=audio-input, State=Hover` (node 711:299).
 struct OrbBlobTests {
     @Test func layersMatchFigmaNamesAndOrder() {
-        #expect(OrbBlob.allCases.map(\.figmaName) == ["blob 3", "blob 2", "blob 1"])
-        #expect(OrbBlob.allCases.map(\.figmaNodeID) == ["711:285", "711:283", "711:284"])
+        #expect(OrbBlob.allCases.map(\.figmaName) == ["blob 5", "blob 4", "blob 3", "blob 2", "blob 1"])
+        #expect(OrbBlob.allCases.map(\.figmaNodeID) == ["711:282", "711:286", "711:285", "711:283", "711:284"])
     }
 
     @Test(arguments: [
-        (OrbBlob.blob3, 47.29, 49.58, 16.98),
+        (OrbBlob.blob5, 25.51, 41.59, 16.98),
+        (.blob4, 53.71, 27.99, 65.79),
+        (.blob3, 47.29, 49.58, 16.98),
         (.blob2, 42.95, 44.47, -58.02),
         (.blob1, 31.82, 22.55, -74.16)
     ])
@@ -24,7 +26,9 @@ struct OrbBlobTests {
 
     /// The idle variant's blob centres, read from Figma node 711:308.
     @Test(arguments: [
-        (OrbBlob.blob3, 26.29, 42.52),
+        (OrbBlob.blob5, 38.95, 23.08),
+        (.blob4, 45.90, 53.60),
+        (.blob3, 26.29, 42.52),
         (.blob2, 32.25, 39.43),
         (.blob1, 56.10, 33.48)
     ])

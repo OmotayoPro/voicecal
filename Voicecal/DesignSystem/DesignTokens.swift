@@ -66,6 +66,8 @@ enum DesignTokens {
 
     /// The listening mic key's orb (Figma `button / Type=audio-input, State=Hover`).
     enum MicOrb {
+        /// `buttons/primary-hover`, on blob 5 and blob 4.
+        static let blobLight = Color(.buttonsPrimaryHover)
         /// `buttons/primary-default` and `yellow/500` (the same orange), on blob 2 and blob 1.
         static let blobCore = Color(.buttonsPrimaryDefault)
         /// `yellow/900`, on blob 3.
