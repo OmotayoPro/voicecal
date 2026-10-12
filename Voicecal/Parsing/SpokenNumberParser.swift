@@ -74,7 +74,7 @@ enum SpokenNumberParser {
 
     /// "two thousand three hundred and five" -> "2305".
     private static func cardinal(_ lexemes: [Lexeme], _ index: Int) -> (String, Int)? {
-        if word(lexemes, index) == "zero" {
+        if word(lexemes, index).flatMap({ SpokenVocabulary.units[$0] }) == 0 {
             return ("0", 1)
         }
         var builder = CardinalBuilder()
@@ -146,7 +146,7 @@ enum SpokenNumberParser {
 
     /// The digits after "point": "point two five" -> "25".
     private static func fraction(_ lexemes: [Lexeme], _ index: Int) -> (String, Int)? {
-        guard word(lexemes, index) == SpokenVocabulary.decimalPoint else { return nil }
+        guard let point = word(lexemes, index), SpokenVocabulary.decimalPoints.contains(point) else { return nil }
         var digits = ""
         var used = 1
         while let next = lexeme(lexemes, index + used) {
