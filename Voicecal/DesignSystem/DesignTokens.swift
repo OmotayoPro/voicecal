@@ -64,16 +64,26 @@ enum DesignTokens {
         static let edgeHighlightBottom: Double = 0.3
     }
 
-    /// Blob colors and blur of the listening mic key.
-    enum MicGlow {
-        static let light = Color(.buttonsPrimaryHover)
-        static let core = Color(.buttonsPrimaryDefault)
-        static let deep = Color(.yellow900)
-        static let blur: CGFloat = 10
-        static let spreadScale: CGFloat = 1.5
-        static let spreadBlur: CGFloat = 10
-        static let spreadOpacity: Double = 0.3
-        static let fadeDuration: Double = 0.6
+    /// The listening mic key's orb (Figma `button / Type=audio-input, State=Hover`).
+    enum MicOrb {
+        /// `buttons/primary-hover`, on blob 5 and blob 4.
+        static let blobLight = Color(.buttonsPrimaryHover)
+        /// `buttons/primary-default` and `yellow/500` (the same orange), on blob 2 and blob 1.
+        static let blobCore = Color(.buttonsPrimaryDefault)
+        /// `yellow/900`, on blob 3.
+        static let blobDeep = Color(.yellow900)
+        /// Figma layer blur 20, which is a blur radius of 10 here.
+        static let blobBlur: CGFloat = 10
+        /// The point the blob group turns about, as a fraction of the key. Derived from the two
+        /// Figma variants: it is the one point that maps every idle blob onto its listening position.
+        static let pivot = UnitPoint(x: 39.6 / 84, y: 37.7 / 84)
+
+        static let blobStrengthUnderGlass: Double = 0.8
+
+        // Stand-in for the glass layer on systems without glass effects.
+        static let fallbackSpreadScale: CGFloat = 1.5
+        static let fallbackSpreadBlur: CGFloat = 10
+        static let fallbackSpreadOpacity: Double = 0.3
     }
 
     enum Typography {
