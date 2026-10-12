@@ -239,3 +239,54 @@ struct VoiceSettingsWiringTests {
         #expect(viewModel.micCountdown == nil)
     }
 }
+
+struct SpeechLocalesTests {
+    private let supported: Set<String> = ["en-US", "en-GB", "en-AU", "en-IN", "fr-FR"]
+
+    @Test func usesTheChosenAccentWhenSupported() {
+        #expect(SpeechLocales.resolve(preferred: "en-GB", deviceLanguages: ["en-US"], supported: supported) == "en-GB")
+    }
+
+    @Test func automaticFollowsTheFirstSupportedEnglishDeviceLanguage() {
+        let languages = ["fr-FR", "en-AU", "en-GB"]
+        #expect(SpeechLocales.resolve(preferred: nil, deviceLanguages: languages, supported: supported) == "en-AU")
+        #expect(SpeechLocales.resolve(preferred: nil, deviceLanguages: ["en_IN"], supported: supported) == "en-IN")
+    }
+
+    @Test func unsupportedChoicesFallBackToUSEnglish() {
+        #expect(SpeechLocales.resolve(preferred: "en-NG", deviceLanguages: ["en-NG"], supported: supported) == "en-US")
+        #expect(SpeechLocales.resolve(preferred: nil, deviceLanguages: ["yo-NG"], supported: supported) == "en-US")
+        #expect(SpeechLocales.resolve(preferred: nil, deviceLanguages: [], supported: []) == "en-US")
+    }
+
+    @Test func offersOnlyEnglishVariantsSortedByName() {
+        let options = SpeechLocales.englishOptions(supported: supported, displayLocale: Locale(identifier: "en_US"))
+        #expect(options.map(\.id) == ["en-AU", "en-IN", "en-GB", "en-US"])
+        #expect(options.first?.name == "English (Australia)")
+    }
+}
+
+@MainActor
+struct RecognitionSettingsTests {
+    @Test func defaultsKeepRecognitionOnTheDevice() async {
+        let speech = FakeSpeechRecognizer()
+        let viewModel = CalculatorViewModel(speech: speech, settings: VoiceSettings(defaults: makeScratchDefaults()))
+        await viewModel.startListening()
+        #expect(speech.lastOptions == SpeechOptions(localeIdentifier: nil, allowsServerRecognition: false))
+    }
+
+    @Test func chosenAccentAndServerChoiceReachTheRecognizer() async {
+        let speech = FakeSpeechRecognizer()
+        let defaults = makeScratchDefaults()
+        let settings = VoiceSettings(defaults: defaults)
+        settings.recognitionLocaleIdentifier = "en-GB"
+        settings.allowsServerRecognition = true
+        let viewModel = CalculatorViewModel(speech: speech, settings: settings)
+        await viewModel.startListening()
+        #expect(speech.lastOptions == SpeechOptions(localeIdentifier: "en-GB", allowsServerRecognition: true))
+
+        let reloaded = VoiceSettings(defaults: defaults)
+        #expect(reloaded.recognitionLocaleIdentifier == "en-GB")
+        #expect(reloaded.allowsServerRecognition)
+    }
+}

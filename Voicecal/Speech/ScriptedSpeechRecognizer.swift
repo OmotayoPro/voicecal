@@ -19,7 +19,7 @@
             .granted
         }
 
-        func start() throws {
+        func start(options _: SpeechOptions) throws {
             playback = Task { [weak self, partials] in
                 for partial in partials {
                     try? await Task.sleep(for: .milliseconds(150))
