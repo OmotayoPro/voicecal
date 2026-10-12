@@ -170,6 +170,7 @@ Must handle:
 - Words heard instead of a digit always count as that digit, with no context needed: `oh`/`o` → 0, `tree`/`tri`/`free` → 3, `sis`/`sex`/`sicks` → 6, `ate`/`hate`/`ait` → 8, plus `wan`, `tu`, `fife`, `nein`. `dot` means the same as `point`.
 - Operators also accept `divide`/`divided` and `multiply`/`multiplied`/`multiples`/`multiple` without "by".
 - `delete` removes the last entry (a whole number or operator), once per mention.
+- Figures can be read out digit by digit: "one five zero zero" is 1500, however the recognizer writes it ("1 5 0 0", "15 0 0"). `double` and `triple` repeat the next digit. A plain run of digits spoken straight after a number, with no operator between, carries that number on, so pausing between digits still builds one figure.
 - Unknown words are ignored (never crash, never insert garbage).
 
 Number-word parsing is its own unit (`SpokenNumberParser`) so it can be tested in isolation.

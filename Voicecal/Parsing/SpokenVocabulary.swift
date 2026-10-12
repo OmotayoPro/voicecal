@@ -32,6 +32,8 @@ enum SpokenVocabulary {
         "sixty": 60, "seventy": 70, "eighty": 80, "ninety": 90
     ]
     static let scales: [String: Int] = ["thousand": 1000, "million": 1_000_000]
+    /// "double five" is 55.
+    static let repeats: [String: Int] = ["double": 2, "triple": 3]
     static let hundred = "hundred"
     static let decimalPoints: Set<String> = ["point", "dot"]
     static let negative = "negative"
@@ -86,7 +88,7 @@ enum SpokenVocabulary {
 
     static func isNumberWord(_ word: String) -> Bool {
         units[word] != nil || teens[word] != nil || tens[word] != nil || scales[word] != nil
-            || word == hundred || decimalPoints.contains(word)
+            || word == hundred || decimalPoints.contains(word) || repeats[word] != nil
     }
 
     /// Every word that appears in an operator phrase ("divided", "by", "times"...).

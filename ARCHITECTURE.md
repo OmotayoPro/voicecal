@@ -39,6 +39,7 @@ Case 3 is what makes input hybrid. `CalculatorViewModel.prepareForManualEdit` co
 - **Commands wait for a commit.** "clear", "delete" and "equals" are not run from a partial, since the recognizer may still revise them. At commit time the uncommitted items are replayed in spoken order, so "two plus two equals times three" works.
 - **Minus.** "minus five" is a negative number at the start of an equation or after an operator, and subtraction after a value. The session tells the parser which case applies from the tokens ahead of the pending ones.
 - **Tap a token, then speak.** The first spoken number replaces the token being edited, through the same `Equation.insert` rule the keypad uses.
+- **Digit by digit.** A plain run of digits arriving straight after a number extends that number instead of being inserted beside it, so "one", pause, "five", pause, "zero" is 150. While the digits are still pending, `Equation` remembers the number as it was, so a revised transcript can take them back.
 - **Task rollover.** Recognition tasks end after about a minute or on silence. The service starts a new one and emits `segmentRestarted`; the session commits and resets `heard` and `consumedCount`, because the new task's transcript starts from empty.
 - **After equals.** `Equation.isShowingResult` makes the next number (typed or spoken) start a new equation, while an operator continues from the result.
 

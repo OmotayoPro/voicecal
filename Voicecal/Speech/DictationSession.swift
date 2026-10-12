@@ -47,7 +47,7 @@ final class DictationSession {
             equation.setPending([])
             for item in items {
                 if let token = item.token {
-                    equation.insert(token)
+                    equation.insertSpoken(token)
                 } else if case let .command(command) = item {
                     onCommand?(command)
                 }
