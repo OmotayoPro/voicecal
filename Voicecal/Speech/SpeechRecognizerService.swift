@@ -5,7 +5,8 @@ import Speech
 final class SpeechRecognizerService: SpeechRecognizing {
     var onEvent: ((SpeechEvent) -> Void)?
 
-    private let recognizer = SFSpeechRecognizer(locale: Locale(identifier: "en-US"))
+    private var recognizer: SFSpeechRecognizer?
+    private var options = SpeechOptions()
     private let engine = AVAudioEngine()
     private var request: SFSpeechAudioBufferRecognitionRequest?
     private var task: SFSpeechRecognitionTask?
@@ -27,11 +28,12 @@ final class SpeechRecognizerService: SpeechRecognizing {
     func requestPermission() async -> SpeechPermission {
         guard await AVAudioApplication.requestRecordPermission() else { return .microphoneDenied }
         guard await Self.requestSpeechAuthorization() == .authorized else { return .speechDenied }
-        guard let recognizer, recognizer.isAvailable else { return .unavailable }
         return .granted
     }
 
-    func start() throws {
+    func start(options: SpeechOptions) throws {
+        self.options = options
+        let recognizer = recognizer(for: options)
         guard let recognizer, recognizer.isAvailable else { throw SpeechError.unavailable }
         let session = AVAudioSession.sharedInstance()
         try session.setCategory(.playAndRecord, mode: .measurement, options: [.duckOthers, .defaultToSpeaker])
@@ -72,6 +74,19 @@ final class SpeechRecognizerService: SpeechRecognizing {
         onEvent?(.stopped)
     }
 
+    /// The recognizer for the chosen English variant, reused until the choice changes.
+    private func recognizer(for options: SpeechOptions) -> SFSpeechRecognizer? {
+        let identifier = SpeechLocales.resolve(
+            preferred: options.localeIdentifier,
+            deviceLanguages: Locale.preferredLanguages,
+            supported: SpeechLocales.supportedIdentifiers
+        )
+        if recognizer?.locale.identifier(.bcp47) != identifier {
+            recognizer = SFSpeechRecognizer(locale: Locale(identifier: identifier))
+        }
+        return recognizer
+    }
+
     // MARK: - Recognition tasks
 
     private func beginTask(with recognizer: SFSpeechRecognizer) {
@@ -81,7 +96,12 @@ final class SpeechRecognizerService: SpeechRecognizing {
 
         let request = SFSpeechAudioBufferRecognitionRequest()
         request.shouldReportPartialResults = true
+        // On-device keeps audio on the phone and has no time limit; the server is usually more accurate.
         request.requiresOnDeviceRecognition = recognizer.supportsOnDeviceRecognition
+            && !options.allowsServerRecognition
+        request.taskHint = .dictation
+        // Punctuation is noise here: "12." must not turn into a decimal or a sentence break.
+        request.addsPunctuation = false
         request.contextualStrings = SpokenVocabulary.contextualStrings
         self.request = request
 

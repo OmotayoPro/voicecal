@@ -52,6 +52,16 @@ final class VoiceSettings {
         didSet { defaults.set(inactivityTimeout.rawValue, forKey: Key.inactivityTimeout) }
     }
 
+    /// The English variant to recognize, e.g. "en-GB". Nil follows the device's languages.
+    var recognitionLocaleIdentifier: String? {
+        didSet { defaults.set(recognitionLocaleIdentifier, forKey: Key.recognitionLocale) }
+    }
+
+    /// Whether Apple's servers may do the recognition instead of the phone.
+    var allowsServerRecognition: Bool {
+        didSet { defaults.set(allowsServerRecognition, forKey: Key.allowsServerRecognition) }
+    }
+
     @ObservationIgnored private let defaults: UserDefaults
 
     init(defaults: UserDefaults = .standard) {
@@ -62,6 +72,8 @@ final class VoiceSettings {
         speaksResult = defaults.object(forKey: Key.speaksResult) as? Bool ?? true
         inactivityTimeout = (defaults.object(forKey: Key.inactivityTimeout) as? Int)
             .flatMap(InactivityTimeout.init) ?? .tenSeconds
+        recognitionLocaleIdentifier = defaults.string(forKey: Key.recognitionLocale)
+        allowsServerRecognition = defaults.bool(forKey: Key.allowsServerRecognition)
     }
 
     private enum Key {
@@ -70,6 +82,8 @@ final class VoiceSettings {
         static let pitch = "voice.pitch"
         static let speaksResult = "voice.speaksResult"
         static let inactivityTimeout = "listening.inactivityTimeout"
+        static let recognitionLocale = "listening.recognitionLocale"
+        static let allowsServerRecognition = "listening.allowsServerRecognition"
     }
 }
 

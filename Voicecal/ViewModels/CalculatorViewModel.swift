@@ -178,7 +178,7 @@ final class CalculatorViewModel {
         switch await speech.requestPermission() {
         case .granted:
             do {
-                try speech.start()
+                try speech.start(options: speechOptions)
                 isListening = true
                 inactivityTimer.start(policy: inactivityPolicy)
             } catch {
@@ -196,6 +196,13 @@ final class CalculatorViewModel {
             speech?.stop()
         }
         finishListening()
+    }
+
+    private var speechOptions: SpeechOptions {
+        SpeechOptions(
+            localeIdentifier: settings.recognitionLocaleIdentifier,
+            allowsServerRecognition: settings.allowsServerRecognition
+        )
     }
 
     private var inactivityPolicy: InactivityPolicy {
@@ -301,7 +308,7 @@ final class CalculatorViewModel {
         isPausedForSpeech = false
         guard isListening else { return }
         do {
-            try speech?.start()
+            try speech?.start(options: speechOptions)
             // Resuming counts as activity: the countdown starts over.
             inactivityTimer.start(policy: inactivityPolicy)
         } catch {

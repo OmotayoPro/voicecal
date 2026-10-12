@@ -207,7 +207,7 @@ Stop listening cleanly when: the app enters background, an audio interruption be
 ### 10.4 Recognition task limits
 `SFSpeechRecognizer` tasks are time-limited (about 1 minute). Handle the final/ended callback by **silently starting a new task** if the user still has listening on, then reset `consumedTranscriptLength = 0` for the new transcript. The user should never notice the seam.
 
-Prefer on-device recognition when available (`supportsOnDeviceRecognition` → `requiresOnDeviceRecognition = true`). Set `shouldReportPartialResults = true`. Consider `contextualStrings` with number words and operator words to improve accuracy.
+Recognition uses the English variant chosen in settings (Automatic follows the device's languages, falling back to US English). Prefer on-device recognition when available (`supportsOnDeviceRecognition` → `requiresOnDeviceRecognition = true`). Set `shouldReportPartialResults = true`. A settings switch, off by default, lets Apple's servers do the recognition instead, which is usually more accurate but sends audio off the device. Consider `contextualStrings` with number words and operator words to improve accuracy.
 
 ## 11. Speaking the result
 

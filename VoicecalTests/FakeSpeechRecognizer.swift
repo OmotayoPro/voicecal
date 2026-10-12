@@ -9,15 +9,17 @@ final class FakeSpeechRecognizer: SpeechRecognizing {
     private(set) var isRunning = false
     private(set) var startCount = 0
     private(set) var stopCount = 0
+    private(set) var lastOptions: SpeechOptions?
 
     func requestPermission() async -> SpeechPermission {
         permission
     }
 
-    func start() throws {
+    func start(options: SpeechOptions) throws {
         if let startError {
             throw startError
         }
+        lastOptions = options
         isRunning = true
         startCount += 1
     }

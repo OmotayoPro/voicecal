@@ -27,6 +27,6 @@ protocol SpeechRecognizing: AnyObject {
     var onEvent: ((SpeechEvent) -> Void)? { get set }
     /// Asks for microphone access, then speech recognition access.
     func requestPermission() async -> SpeechPermission
-    func start() throws
+    func start(options: SpeechOptions) throws
     func stop()
 }

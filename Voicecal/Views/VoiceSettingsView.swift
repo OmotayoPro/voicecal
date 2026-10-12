@@ -3,6 +3,7 @@ import SwiftUI
 struct VoiceSettingsView: View {
     @Bindable var settings: VoiceSettings
     var voices: [VoiceOption] = VoiceCatalog.systemVoices()
+    var accents: [SpeechLocaleOption] = SpeechLocales.englishOptions()
     let onPreview: () -> Void
 
     @Environment(\.dismiss) private var dismiss
@@ -26,6 +27,24 @@ struct VoiceSettingsView: View {
                     Text("Spoken answer")
                 } footer: {
                     Text("When this is on, equals reads the answer aloud.")
+                }
+
+                Section {
+                    Picker("Accent", selection: $settings.recognitionLocaleIdentifier) {
+                        Text("Automatic").tag(String?.none)
+                        ForEach(accents) { accent in
+                            Text(accent.name).tag(String?.some(accent.id))
+                        }
+                    }
+                    Toggle("Use Apple's servers", isOn: $settings.allowsServerRecognition)
+                } header: {
+                    Text("Recognition")
+                } footer: {
+                    Text(
+                        "Choose the English closest to how you speak. Apple's servers are usually more "
+                            + "accurate than the phone alone, but your speech is sent to Apple and you need "
+                            + "to be online."
+                    )
                 }
 
                 Section {
@@ -53,7 +72,7 @@ struct VoiceSettingsView: View {
                 }
             }
         }
-        .onAppear(perform: forgetMissingVoice)
+        .onAppear(perform: forgetMissingChoices)
     }
 
     private var voicePicker: some View {
@@ -85,10 +104,13 @@ struct VoiceSettingsView: View {
         }
     }
 
-    /// A stored voice that has since been removed from the device falls back to the default.
-    private func forgetMissingVoice() {
+    /// A stored voice or accent that the device no longer offers falls back to the default.
+    private func forgetMissingChoices() {
         if let chosen = settings.voiceIdentifier, !voices.contains(where: { $0.id == chosen }) {
             settings.voiceIdentifier = nil
+        }
+        if let chosen = settings.recognitionLocaleIdentifier, !accents.contains(where: { $0.id == chosen }) {
+            settings.recognitionLocaleIdentifier = nil
         }
     }
 }
