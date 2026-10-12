@@ -44,6 +44,38 @@ struct OrbBlobTests {
     }
 }
 
+struct OrbBlobMotionTests {
+    @Test(arguments: OrbBlob.allCases)
+    func startsExactlyOnTheFigmaPose(blob: OrbBlob) {
+        let placement = blob.placement(at: 0)
+        #expect(abs(placement.center.x - blob.center.x) < 0.001)
+        #expect(abs(placement.center.y - blob.center.y) < 0.001)
+        #expect(abs(placement.rotation - blob.rotation) < 0.001)
+    }
+
+    @Test(arguments: OrbBlob.allCases)
+    func keepsMovingAndTurning(blob: OrbBlob) {
+        let early = blob.placement(at: 1)
+        let later = blob.placement(at: 2)
+        let travelled = hypot(later.center.x - early.center.x, later.center.y - early.center.y)
+        #expect(travelled > 1)
+        #expect(abs(later.rotation - early.rotation) > 5)
+    }
+
+    @Test(arguments: OrbBlob.allCases)
+    func staysInsideTheButton(blob: OrbBlob) {
+        for step in 0 ... 1200 {
+            let center = blob.placement(at: Double(step) * 0.1).center
+            #expect((0 ... 84).contains(center.x) && (0 ... 84).contains(center.y))
+        }
+    }
+
+    @Test func blobsMoveAtDifferentPaces() {
+        let turned = OrbBlob.allCases.map { $0.placement(at: 3).rotation - $0.rotation }
+        #expect(Set(turned.map { ($0 * 10).rounded() }).count == OrbBlob.allCases.count)
+    }
+}
+
 struct OrbMotionTests {
     private let start = Date(timeIntervalSinceReferenceDate: 1000)
 
@@ -57,45 +89,48 @@ struct OrbMotionTests {
         return motion
     }
 
+    private let atRest = OrbMotion.Pose(angle: OrbMotion.idleAngle, opacity: 0, drift: 0)
+
     @Test func restsHiddenInTheIdlePose() {
-        #expect(OrbMotion().pose(at: start) == OrbMotion.Pose(angle: OrbMotion.idleAngle, opacity: 0))
+        #expect(OrbMotion().pose(at: start) == atRest)
     }
 
     @Test func turningOnSweepsInFromTheIdlePoseWhileFadingIn() {
         let motion = listening()
-        #expect(motion.pose(at: start) == OrbMotion.Pose(angle: OrbMotion.idleAngle, opacity: 0))
+        #expect(motion.pose(at: start) == atRest)
         let halfway = motion.pose(at: after(0.15))
         #expect(abs(halfway.opacity - 0.75) < 0.001) // ease-out: most of the change comes early
         #expect(halfway.angle < OrbMotion.idleAngle && halfway.angle > 0)
-        #expect(motion.pose(at: after(OrbMotion.transition)).opacity == 1)
+        let arrived = motion.pose(at: after(OrbMotion.transition))
+        #expect(arrived.opacity == 1)
+        #expect(arrived.angle == 0)
     }
 
-    @Test func keepsTurningAnticlockwiseWhileListening() {
+    @Test func blobsDriftForAsLongAsTheMicIsOn() {
         let motion = listening()
-        let early = motion.pose(at: after(3)).angle
-        let later = motion.pose(at: after(6)).angle
-        #expect(later < early)
-        #expect(abs((early - later) - 90) < 0.001) // a quarter turn every 3 of 12 seconds
-        #expect(abs(motion.pose(at: after(12)).angle + 360) < 0.001)
+        #expect(abs(motion.pose(at: after(3)).drift - 3) < 0.001)
+        #expect(abs(motion.pose(at: after(600)).drift - 600) < 0.001)
         #expect(motion.pose(at: after(600)).opacity == 1)
+        #expect(motion.pose(at: after(600)).angle == 0)
     }
 
-    @Test func turningOffSweepsBackAndFadesOut() {
+    @Test func turningOffSweepsBackFadesOutAndStopsTheBlobs() {
         var motion = listening()
         let before = motion.pose(at: after(5))
         motion.setActive(false, at: after(5))
         #expect(motion.pose(at: after(5)) == before)
         let done = motion.pose(at: after(5 + OrbMotion.transition))
         #expect(done.opacity == 0)
-        #expect(abs(done.angle - (before.angle + OrbMotion.idleAngle)) < 0.001)
-        #expect(motion.pose(at: after(60)) == done) // it stops turning
+        #expect(abs(done.angle - OrbMotion.idleAngle) < 0.001)
+        #expect(done.drift == before.drift)
+        #expect(motion.pose(at: after(60)) == done)
     }
 
-    @Test func turningOnAgainStartsFromTheIdlePose() {
+    @Test func turningOnAgainStartsFromTheFigmaPose() {
         var motion = listening()
         motion.setActive(false, at: after(5))
         motion.setActive(true, at: after(20))
-        #expect(motion.pose(at: after(20)) == OrbMotion.Pose(angle: OrbMotion.idleAngle, opacity: 0))
+        #expect(motion.pose(at: after(20)) == atRest)
     }
 
     @Test func interruptingTheFadeCarriesOnFromWhereItIs() {
@@ -103,22 +138,21 @@ struct OrbMotionTests {
         motion.setActive(false, at: after(5))
         let midFade = motion.pose(at: after(5.1))
         motion.setActive(true, at: after(5.1))
-        let resumed = motion.pose(at: after(5.1))
-        #expect(resumed.opacity == midFade.opacity)
-        #expect(abs(resumed.angle) <= 180)
+        #expect(motion.pose(at: after(5.1)) == midFade)
+        #expect(motion.pose(at: after(6)).drift > midFade.drift)
     }
 
     @Test func repeatedCallsWithTheSameStateChangeNothing() {
         var motion = listening()
         motion.setActive(true, at: after(4))
-        #expect(abs(motion.pose(at: after(12)).angle + 360) < 0.001)
+        #expect(abs(motion.pose(at: after(12)).drift - 12) < 0.001)
     }
 
-    @Test func reduceMotionFadesWithoutTurning() {
+    @Test func reduceMotionFadesWithoutMoving() {
         let motion = listening()
         let halfway = motion.pose(at: after(0.15), reduceMotion: true)
-        #expect(halfway.angle == 0)
+        #expect(halfway.angle == 0 && halfway.drift == 0)
         #expect(abs(halfway.opacity - 0.75) < 0.001)
-        #expect(motion.pose(at: after(9), reduceMotion: true) == OrbMotion.Pose(angle: 0, opacity: 1))
+        #expect(motion.pose(at: after(9), reduceMotion: true) == OrbMotion.Pose(angle: 0, opacity: 1, drift: 0))
     }
 }

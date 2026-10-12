@@ -8,8 +8,9 @@ import SwiftUI
 ///     icon                                     drawn by the key itself
 ///
 /// In Figma the idle variant holds the same layers, hidden, with the five blobs turned as one
-/// group; tapping smart-animates between the variants. `OrbMotion` reproduces that sweep and
-/// then keeps the group turning for as long as the mic is on. Place this inside a circle clip.
+/// group; tapping smart-animates between the variants. `OrbMotion` reproduces that sweep. After
+/// it, each blob keeps circling and turning at its own pace for as long as the mic is on, which
+/// is the feedback that the mic is live. Place this inside a circle clip.
 struct MicOrbView: View {
     let isActive: Bool
 
@@ -22,11 +23,11 @@ struct MicOrbView: View {
         TimelineView(.animation(paused: !isActive && !isSettling)) { context in
             let pose = motion.pose(at: context.date, reduceMotion: reduceMotion)
             ZStack {
-                blobs
+                blobs(at: pose.drift)
                     .rotationEffect(.degrees(pose.angle), anchor: DesignTokens.MicOrb.pivot)
-                    .opacity(pose.opacity * blobStrength)
+                    .opacity(pose.opacity)
                     .blendMode(.plusLighter)
-                glass(blobAngle: pose.angle)
+                glass(over: pose)
                     .opacity(pose.opacity)
             }
         }
@@ -38,46 +39,38 @@ struct MicOrbView: View {
         }
     }
 
-    /// The system glass brightens what it refracts more than Figma's does, so the blobs
-    /// are toned down beneath it to land on the same overall brightness.
-    private var blobStrength: Double {
-        if #available(iOS 26.0, *) {
-            DesignTokens.MicOrb.blobStrengthUnderGlass
-        } else {
-            1
-        }
-    }
-
-    /// Figma layers `blob 5` to `blob 1`, in layer order.
-    private var blobs: some View {
+    /// Figma layers `blob 5` to `blob 1`, in layer order, each where its own motion has taken it.
+    private func blobs(at drift: TimeInterval) -> some View {
         ZStack {
             ForEach(OrbBlob.allCases, id: \.self) { blob in
+                let placement = blob.placement(at: drift)
                 SVGPath(blob.path)
                     .fill(blob.color)
                     .frame(width: blob.size.width, height: blob.size.height)
                     .blur(radius: DesignTokens.MicOrb.blobBlur)
-                    .rotationEffect(.degrees(blob.rotation))
-                    .position(blob.center)
+                    .rotationEffect(.degrees(placement.rotation))
+                    .position(placement.center)
                     .blendMode(.plusLighter)
             }
         }
         .frame(width: DesignTokens.Size.key, height: DesignTokens.Size.key)
     }
 
-    /// Figma layer `glass`: a clear ellipse whose glass effect refracts the blobs beneath it.
-    @ViewBuilder
-    private func glass(blobAngle: Double) -> some View {
-        if #available(iOS 26.0, *) {
-            Color.clear
-                .glassEffect(.clear, in: .circle)
-        } else {
-            // No glass before iOS 26. A wider, softer copy of the blobs stands in for the way
-            // the glass spreads their light towards the rim.
-            blobs
-                .rotationEffect(.degrees(blobAngle), anchor: DesignTokens.MicOrb.pivot)
-                .scaleEffect(DesignTokens.MicOrb.fallbackSpreadScale)
-                .blur(radius: DesignTokens.MicOrb.fallbackSpreadBlur)
-                .opacity(DesignTokens.MicOrb.fallbackSpreadOpacity)
+    /// Figma layer `glass`: a clear ellipse whose glass effect refracts the blobs beneath it,
+    /// carrying their colour out to the rim so the whole key turns gold.
+    ///
+    /// Figma's glass cannot be reproduced exactly. The system glass effect (iOS 26) was tried and
+    /// washes the orb out, so the same result is built by hand on every iOS version: a warm tint
+    /// over the whole key, plus a wider, softer copy of the blobs that follows them around.
+    private func glass(over pose: OrbMotion.Pose) -> some View {
+        ZStack {
+            Circle()
+                .fill(DesignTokens.MicOrb.blobCore.opacity(DesignTokens.MicOrb.glassTint))
+            blobs(at: pose.drift)
+                .rotationEffect(.degrees(pose.angle), anchor: DesignTokens.MicOrb.pivot)
+                .scaleEffect(DesignTokens.MicOrb.glassSpreadScale)
+                .blur(radius: DesignTokens.MicOrb.glassSpreadBlur)
+                .opacity(DesignTokens.MicOrb.glassSpreadOpacity)
                 .blendMode(.plusLighter)
         }
     }
@@ -155,6 +148,52 @@ enum OrbBlob: CaseIterable {
         case .blob3: DesignTokens.MicOrb.blobDeep
         case .blob2, .blob1: DesignTokens.MicOrb.blobCore
         }
+    }
+
+    // MARK: Motion while listening
+
+    /// How this blob moves once the mic is on. Every blob circles the pivot the same way round,
+    /// but each at its own speed, breathing in and out from the pivot and turning on itself at
+    /// its own rate, so the light keeps shifting and never visibly repeats.
+    private var motion: BlobMotion {
+        switch self {
+        case .blob5: BlobMotion(orbit: 7, breath: 4.3, reach: 0.25, spin: 10)
+        case .blob4: BlobMotion(orbit: 9, breath: 3.1, reach: 0.2, spin: -13)
+        case .blob3: BlobMotion(orbit: 12, breath: 5.2, reach: 0.3, spin: 16)
+        case .blob2: BlobMotion(orbit: 5.5, breath: 3.7, reach: 0.6, spin: -8)
+        case .blob1: BlobMotion(orbit: 8, breath: 4.9, reach: 0.2, spin: 11)
+        }
+    }
+
+    private struct BlobMotion {
+        /// Seconds to circle the pivot once.
+        let orbit: TimeInterval
+        /// Seconds for one move out from the pivot and back.
+        let breath: TimeInterval
+        /// How far that move goes, as a share of the blob's distance from the pivot.
+        let reach: Double
+        /// Seconds for one turn about its own centre. Negative turns the other way.
+        let spin: TimeInterval
+    }
+
+    /// Where the blob is, and how it is turned, after `drift` seconds of listening.
+    /// At zero this is exactly the Figma listening pose.
+    func placement(at drift: TimeInterval) -> (center: CGPoint, rotation: Double) {
+        let pivot = CGPoint(
+            x: DesignTokens.MicOrb.pivot.x * DesignTokens.Size.key,
+            y: DesignTokens.MicOrb.pivot.y * DesignTokens.Size.key
+        )
+        // Anticlockwise, continuing the direction of the sweep that brings the orb in.
+        let orbitDegrees = -360 * drift / motion.orbit
+        let radians = orbitDegrees * .pi / 180
+        let reach = 1 + motion.reach * sin(2 * .pi * drift / motion.breath)
+        let offsetX = (center.x - pivot.x) * reach
+        let offsetY = (center.y - pivot.y) * reach
+        let moved = CGPoint(
+            x: pivot.x + offsetX * cos(radians) - offsetY * sin(radians),
+            y: pivot.y + offsetX * sin(radians) + offsetY * cos(radians)
+        )
+        return (moved, rotation + orbitDegrees + 360 * drift / motion.spin)
     }
 
     /// Size of the exported artwork: the vector plus 20 pt of room on every side for its blur.

@@ -78,12 +78,11 @@ enum DesignTokens {
         /// Figma variants: it is the one point that maps every idle blob onto its listening position.
         static let pivot = UnitPoint(x: 39.6 / 84, y: 37.7 / 84)
 
-        static let blobStrengthUnderGlass: Double = 0.8
-
-        // Stand-in for the glass layer on systems without glass effects.
-        static let fallbackSpreadScale: CGFloat = 1.5
-        static let fallbackSpreadBlur: CGFloat = 10
-        static let fallbackSpreadOpacity: Double = 0.3
+        // The hand-built glass layer.
+        static let glassTint: Double = 0.38
+        static let glassSpreadScale: CGFloat = 1.5
+        static let glassSpreadBlur: CGFloat = 10
+        static let glassSpreadOpacity: Double = 0.3
     }
 
     enum Typography {

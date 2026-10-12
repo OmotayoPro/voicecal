@@ -83,8 +83,10 @@ final class CalculatorUITests: XCTestCase {
         snapshot("mic-fading-in")
         sleep(1)
         snapshot("mic-on")
-        sleep(2)
-        snapshot("mic-on-later")
+        for frame in 1 ... 4 {
+            sleep(1)
+            snapshot("mic-on-later-\(frame)")
+        }
 
         tap("5", "Add")
         XCTAssertTrue(app.buttons["Stop listening"].exists)
