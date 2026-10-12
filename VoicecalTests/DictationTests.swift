@@ -196,6 +196,39 @@ struct DictationTests {
         #expect(texts == ["5", "+"])
     }
 
+    @Test func everyMentionOfDeleteRemovesAnotherEntry() {
+        type(.digit(1), .add, .digit(2), .multiply, .digit(3))
+        // The transcript is cumulative, so each line below adds to what was already heard.
+        speech.hear("delete", isFinal: true)
+        #expect(texts == ["1", "+", "2", "×"])
+        speech.hear("delete delete delete", isFinal: true)
+        #expect(texts == ["1", "+"])
+        speech.hear("delete delete delete delete delete delete", isFinal: true)
+        #expect(texts.isEmpty)
+    }
+
+    @Test func deleteAfterAPauseStillWorks() {
+        type(.digit(1), .add, .digit(2))
+        speech.hear("delete")
+        speech.send(.segmentRestarted)
+        #expect(texts == ["1", "+"])
+        speech.hear("delete")
+        speech.send(.segmentRestarted)
+        #expect(texts == ["1"])
+    }
+
+    @Test func deleteRemovesAWholeNumberNotOneDigit() {
+        speech.hear("one hundred and five plus twenty delete", isFinal: true)
+        #expect(texts == ["105", "+"])
+    }
+
+    @Test func clearRemovesEverythingLikeTheACKey() {
+        type(.digit(9), .multiply, .digit(9))
+        speech.hear("tree plus sex clear", isFinal: true)
+        #expect(texts.isEmpty)
+        #expect(viewModel.isListening)
+    }
+
     @Test func commandsRunInSpokenOrder() {
         speech.hear("nine clear two plus two equals times three", isFinal: true)
         #expect(texts == ["4", "×", "3"])

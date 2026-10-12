@@ -36,6 +36,18 @@ struct SpokenPhraseParserTests {
         ("6x7", "6 × 7"),
         ("6 * 7", "6 × 7"),
         ("nine divided by three", "9 ÷ 3"),
+        ("nine divided three", "9 ÷ 3"),
+        ("nine divide three", "9 ÷ 3"),
+        ("nine divide by three", "9 ÷ 3"),
+        ("six multiplied seven", "6 × 7"),
+        ("six multiply seven", "6 × 7"),
+        ("six multiply by seven", "6 × 7"),
+        ("six multiples seven", "6 × 7"),
+        ("six multiple seven", "6 × 7"),
+        ("tree plus sex", "3 + 6"),
+        ("ate times hate", "8 × 8"),
+        ("tri dot oh sis", "3.06"),
+        ("oh point five plus oh", "0.5 + 0"),
         ("nine over three", "9 ÷ 3"),
         ("9/3", "9 ÷ 3"),
         ("fifty percent", "50 %"),
@@ -87,7 +99,9 @@ struct SpokenPhraseParserTests {
         ("two plus two equals", "2 + 2 !equals"),
         ("2+2=", "2 + 2 !equals"),
         ("five plus scratch that times three", "5 + !delete × 3"),
-        ("clear all seven", "!clear 7")
+        ("clear all seven", "!clear 7"),
+        ("delete delete delete", "!delete !delete !delete"),
+        ("five plus six delete", "5 + 6 !delete")
     ])
     func commands(transcript: String, expected: String) {
         #expect(SpokenPhraseParser.parse(transcript) == items(expected))
@@ -109,7 +123,7 @@ struct SpokenPhraseParserTests {
 
     @Test(arguments: [
         "I want to go", "this is for you", "too", "for", "hello there", "", "   ", "um so like",
-        "I won the game"
+        "I won the game", "dot", "point"
     ])
     func ordinarySpeechProducesNothing(transcript: String) {
         #expect(SpokenPhraseParser.parse(transcript).isEmpty)

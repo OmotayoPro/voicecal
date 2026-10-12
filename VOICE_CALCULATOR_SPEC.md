@@ -167,6 +167,9 @@ Must handle:
 - Operators: `plus`, `add`, `minus`, `subtract`, `times`, `multiplied by`, `x`, `divided by`, `over`, `percent`
 - Commands: `clear` / `clear all`, `delete` / `scratch that` / `undo` (removes last token), `equals` / `calculate` / `what's the answer` (evaluates, then speaks the result)
 - Common mishears: `"to"`/`"too"` → 2 and `"for"` → 4 **only when adjacent to a numeric or operator context**; `"x"`/`"ex"` → ×. Keep this table in one file, easy to extend.
+- Words heard instead of a digit always count as that digit, with no context needed: `oh`/`o` → 0, `tree`/`tri`/`free` → 3, `sis`/`sex`/`sicks` → 6, `ate`/`hate`/`ait` → 8, plus `wan`, `tu`, `fife`, `nein`. `dot` means the same as `point`.
+- Operators also accept `divide`/`divided` and `multiply`/`multiplied`/`multiples`/`multiple` without "by".
+- `delete` removes the last entry (a whole number or operator), once per mention.
 - Unknown words are ignored (never crash, never insert garbage).
 
 Number-word parsing is its own unit (`SpokenNumberParser`) so it can be tested in isolation.
